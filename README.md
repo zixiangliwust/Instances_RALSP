@@ -42,7 +42,8 @@ Instances_RALSP/
 ├── Instances/              # Benchmark problem instances
 │   ├── example_of_english_paper.txt    # Illustrative example from the paper
 │   ├── example_of_paper.txt            # Additional example
-│   └── experimental_data_100_*.txt     # 100 benchmark instances (1-100)
+│   └── instance_*.txt                  # 120 benchmark instances (001-120)
+├── generate_instances.py   # Instance generation script
 ├── .qoder/                 # Project configuration
 └── LICENSE                 # MIT License
 ```
@@ -56,7 +57,7 @@ Each instance file follows a standardized format:
 [product count]
 
 <product cycle>
-[product_id] [cycle_time]
+[product_id] [demand_quantity]
 
 <number of workstations>
 [workstation count]
@@ -65,7 +66,10 @@ Each instance file follows a standardized format:
 [length_1] [length_2] ... [length_n]
 
 <working hours>
-[product_id] [hour_1] [hour_2] ... [hour_m]
+[product_id] [time_1] [time_2] ... [time_m]
+
+<interval time>
+[cycle_interval]
 
 <product switching cost>
 [from,to] [cost]
@@ -74,11 +78,30 @@ Each instance file follows a standardized format:
 [part count]
 
 <optional frequency>
-[part_id] [frequency]
+[A_l] [B_l]
 
 <product assembly parts>
-[product_id] [part_1_flag] [part_2_flag] ...
+[product_id] [part_req_1] [part_req_2] ...
 ```
+
+### Key Parameters:
+- **Product cycle**: Minimum production demand for each product type (4 products total)
+- **Working hours**: Processing time required at each workstation for each product
+- **Interval time**: Fixed cycle interval (default: 5 time units)
+- **Product switching cost**: Reconfiguration cost when switching between product types
+- **Optional frequency**: Logistics leveling constraints (A_l, B_l) for each part
+- **Product assembly parts**: Quantity of each part required by each product
+
+### Instance Scale:
+The 120 instances are organized into 6 groups based on workstation counts:
+- **5 workstations**: Instances 001-020
+- **10 workstations**: Instances 021-040
+- **15 workstations**: Instances 041-060
+- **20 workstations**: Instances 061-080
+- **25 workstations**: Instances 081-100
+- **30 workstations**: Instances 101-120
+
+Each group uses 20 predefined demand patterns with total demand ranging from 10 to 29 units.
 
 ## 🔬 Problem Description
 
@@ -102,6 +125,15 @@ The RALSP aims to optimize three conflicting objectives simultaneously:
 1. **Minimize Reconfiguration Cost**: Reduce costs associated with switching between product batches
 2. **Equalize Production Workload**: Balance workload across workstations
 3. **Level Logistics**: Smooth material flow and parts consumption
+
+### Problem Characteristics
+
+- **4 product types** across all instances
+- **5 time units** fixed interval cycle time
+- **Processing times**: Randomly generated between 6-25 time units
+- **Reconfiguration costs**: 0 for same product, 0-12 thousand CNY for different products
+- **Part types**: 12-16 different part types per instance
+- **Demand patterns**: 20 predefined patterns with total demand 10-29 units (GCD=1)
 
 ## 🧪 Computational Results
 
@@ -143,6 +175,19 @@ The QMOHH was compared against nine high-performing algorithms:
 ## 📝 Citation
 
 **Status**: Paper submitted (not yet accepted)
+
+## 🔄 Version History
+
+### v2.0 - March 2026 (Current)
+- **120 systematically generated benchmark instances**
+- Organized by workstation scale (5, 10, 15, 20, 25, 30 stations)
+- Reproducible generation with fixed random seed
+- Added instance generation script
+- Updated instance format with interval time parameter
+
+### v1.0 - Previous Version
+- 100 experimental instances (experimental_data_100_*.txt)
+- Initial benchmark suite
 
 When referencing this work, please cite as:
 
@@ -186,11 +231,31 @@ The authors would like to thank the reviewers and editors for their valuable com
 
 ## 💻 Usage
 
+### Generating Instances
+
+To generate all 120 benchmark instances:
+
+```bash
+python generate_instances.py --seed 42 --output ./Instances
+```
+
+**Parameters:**
+- `--seed`: Random seed for reproducibility (default: 42)
+- `--output`: Output directory for instance files (default: D:/instances)
+
+### Using the Instances
+
 The benchmark instances in the `Instances/` directory can be used to:
 - Test and validate optimization algorithms for RALSP
 - Compare performance of multi-objective algorithms
 - Reproduce experimental results from the paper
 - Develop new solution approaches for reconfigurable manufacturing systems
+
+### Instance Naming Convention
+
+- **instance_001.txt to instance_120.txt**: Systematically generated benchmark instances
+- **example_of_english_paper.txt**: Illustrative example used in the paper
+- **example_of_paper.txt**: Additional example for reference
 
 ## 🔮 Future Research Directions
 
