@@ -1,0 +1,17 @@
+# Optional dependencies for evolu framework
+# Install these based on your specific needs
+
+# Mathematical Programming Models (MIP/CP)
+# Required for: DLBP1_Model, SALBP1_Model, UALBP1_Model, etc.
+# For Python 3.10 as current IBMCplex version only support Python 3.10 or lower
+docplex>=2.20.204
+
+# Distributed Computing - PySpark
+# Required for: SparkEvaluator in evolu.util.evaluator
+# Note: Requires Java to be installed
+pyspark>=3.0.0
+
+# Distributed Computing - Dask
+# Required for: DaskEvaluator in evolu.util.evaluator
+dask>=2021.0.0
+

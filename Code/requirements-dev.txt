@@ -1,0 +1,25 @@
+# Development dependencies
+# Install these for development, testing, and code quality
+
+# Include core dependencies
+-r requirements-core.txt
+
+# Testing
+pytest>=6.0.0
+pytest-cov>=2.10.0
+
+# Code formatting
+black>=21.0.0
+
+# Linting
+flake8>=3.8.0
+
+# Type checking
+mypy>=0.800
+types-setuptools
+
+# Documentation generation
+sphinx>=4.0.0
+sphinx-rtd-theme>=1.0.0
+sphinxcontrib-napoleon>=0.7
+

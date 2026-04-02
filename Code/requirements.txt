@@ -1,0 +1,21 @@
+# evolu Framework Dependencies
+# 
+# This file contains all dependencies including core and optional dependencies.
+# For a minimal installation, use requirements-core.txt instead.
+#
+# Installation options:
+# 1. Core only (minimal): pip install -r requirements-core.txt
+# 2. Full installation: pip install -r requirements.txt
+# 3. With optional features: pip install -r requirements-core.txt && pip install -r requirements-optional.txt
+# 4. Development: pip install -r requirements-dev.txt
+
+# Core dependencies (required)
+-r requirements-core.txt
+
+# Optional dependencies (recommended for full functionality)
+# Comment out any you don't need
+-r requirements-optional.txt
+
+# Note: Some optional dependencies may require additional system dependencies:
+# - docplex: Requires CPLEX or compatible solver
+# - pyspark: Requires Java runtime environment (JRE)

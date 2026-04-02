@@ -4,7 +4,7 @@
 
 ## 📋 Overview
 
-This repository contains benchmark instances and supporting materials for the research paper **"Learning-based multi-objective hyper-heuristic algorithm for reconfigurable assembly line scheduling problems"**. 
+This repository contains benchmark instances, source code, and experimental results for the research paper **"Learning-based multi-objective hyper-heuristic algorithm for reconfigurable assembly line scheduling problems"**. 
 
 The study addresses the **Reconfigurable Assembly Line Scheduling Problem (RALSP)**, which involves optimizing product sequences to minimize:
 - **Reconfiguration cost**
@@ -32,20 +32,33 @@ Key features:
 
 ### 3. Comprehensive Evaluation
 - Outperforms 9 state-of-the-art multi-objective algorithms
-- Tested on 100 generated benchmark instances
+- Tested on 120 systematically generated benchmark instances
 - Validated using three performance indicators
+- Complete experimental results and data provided
 
 ## 📁 Repository Structure
 
 ```
 Instances_RALSP/
-├── Instances/              # Benchmark problem instances
+├── Instances/                          # Benchmark problem instances
 │   ├── example_of_english_paper.txt    # Illustrative example from the paper
 │   ├── example_of_paper.txt            # Additional example
 │   └── instance_*.txt                  # 120 benchmark instances (001-120)
-├── generate_instances.py   # Instance generation script
-├── .qoder/                 # Project configuration
-└── LICENSE                 # MIT License
+├── Code/                               # Source code implementation
+│   ├── evolu/                          # Evolutionary algorithm components (4 files)
+│   ├── evolureconfigurablealbp/        # RALSP-specific implementation (1 file)
+│   ├── evolureconfigurablealbp_examples/  # Example usage (1 file)
+│   ├── evolusalbp1/                    # Simple assembly line balancing (1 file)
+│   └── requirements*.txt               # Python dependencies
+├── results/                            # Experimental results and data
+│   ├── QualityIndicatorSummary in Section 6.3.csv    # Algorithm comparison metrics
+│   ├── QualityIndicatorSummary in Section 6.4.csv    # Extended comparison results
+│   ├── all_solutions_by_models in Section 5.csv      # Numerical case solutions
+│   ├── Pareto_solutions_by_QMOHH in Section 5.txt    # QMOHH Pareto front
+│   ├── Pareto_solutions_by_models in Section 5.txt   # Model-based Pareto front
+│   └── Data for Figure 5.xlsx          # Visualization data
+├── .qoder/                             # Project configuration
+└── LICENSE                             # MIT License
 ```
 
 ## 📊 Instance Format
@@ -135,6 +148,39 @@ The RALSP aims to optimize three conflicting objectives simultaneously:
 - **Part types**: 12-16 different part types per instance
 - **Demand patterns**: 20 predefined patterns with total demand 10-29 units (GCD=1)
 
+## 💻 Usage
+
+### Using the Benchmark Instances
+
+The 120 benchmark instances in the `Instances/` directory can be used to:
+- Test and validate optimization algorithms for RALSP
+- Compare performance of multi-objective algorithms
+- Reproduce experimental results from the paper
+- Develop new solution approaches for reconfigurable manufacturing systems
+
+### Source Code Structure
+
+The `Code/` directory contains:
+- **evolu/**: Core evolutionary algorithm components and utilities
+- **evolureconfigurablealbp/**: Implementation specific to RALSP
+- **evolureconfigurablealbp_examples/**: Example usage and test cases
+- **evolusalbp1/**: Simple assembly line balancing reference implementation
+- **requirements files**: Python package dependencies
+
+### Experimental Results
+
+The `results/` directory provides:
+- Complete numerical results from Section 5 (case study)
+- Quality indicator summaries from Section 6.3 and 6.4
+- Pareto optimal solutions obtained by different methods
+- Data for generating figures in the paper
+
+### Instance Naming Convention
+
+- **instance_001.txt to instance_120.txt**: Systematically generated benchmark instances
+- **example_of_english_paper.txt**: Illustrative example used in the paper
+- **example_of_paper.txt**: Additional example for reference
+
 ## 🧪 Computational Results
 
 ### Comparison Algorithms
@@ -178,8 +224,16 @@ The QMOHH was compared against nine high-performing algorithms:
 
 ## 🔄 Version History
 
-### v2.0 - March 2026 (Current)
-- **120 systematically generated benchmark instances**
+### v3.0 - March 2026 (Current)
+- **Complete repository with full implementation**
+- Added source code directory (Code/) with RALSP implementation
+- Added experimental results directory (results/) with complete data
+- Includes quality indicator summaries and Pareto solutions
+- Provides visualization data for paper figures
+- Updated repository structure documentation
+
+### v2.0 - March 2026
+- 120 systematically generated benchmark instances
 - Organized by workstation scale (5, 10, 15, 20, 25, 30 stations)
 - Reproducible generation with fixed random seed
 - Added instance generation script
@@ -229,34 +283,6 @@ The authors would like to thank the reviewers and editors for their valuable com
 6. **Computational Study** - Performance evaluation
 7. **Conclusion** - Summary and future research directions
 
-## 💻 Usage
-
-### Generating Instances
-
-To generate all 120 benchmark instances:
-
-```bash
-python generate_instances.py --seed 42 --output ./Instances
-```
-
-**Parameters:**
-- `--seed`: Random seed for reproducibility (default: 42)
-- `--output`: Output directory for instance files (default: D:/instances)
-
-### Using the Instances
-
-The benchmark instances in the `Instances/` directory can be used to:
-- Test and validate optimization algorithms for RALSP
-- Compare performance of multi-objective algorithms
-- Reproduce experimental results from the paper
-- Develop new solution approaches for reconfigurable manufacturing systems
-
-### Instance Naming Convention
-
-- **instance_001.txt to instance_120.txt**: Systematically generated benchmark instances
-- **example_of_english_paper.txt**: Illustrative example used in the paper
-- **example_of_paper.txt**: Additional example for reference
-
 ## 🔮 Future Research Directions
 
 The paper suggests several promising avenues for future work:
@@ -268,4 +294,4 @@ The paper suggests several promising avenues for future work:
 
 ---
 
-**Note**: This repository will be updated upon paper acceptance with additional materials including source code, detailed experimental results, and implementation guidelines.
+**Note**: This repository provides the complete implementation, benchmark instances, and experimental results to support reproducibility and future research in reconfigurable assembly line scheduling.
