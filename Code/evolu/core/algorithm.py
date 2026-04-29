@@ -619,7 +619,6 @@ class MultiObjectiveSwarmRoot(Algorithm[S, R], ABC):
         self.offspring_population_size = self.population_size
         self.max_evaluations = None
         self.max_iterations = 1000
-        self.p_best, self.g_best = None, None
         self.comparator = store.default_comparator
         self.identical_solutions_comparator = IdenticalSolutionsComparator()
         self.population_generator = store.default_generator

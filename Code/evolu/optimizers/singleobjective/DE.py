@@ -24,7 +24,7 @@ class DEBase(SingleObjectiveSwarmRoot[S, R]):
     References:
     [1] Initial code built based on https://github.com/thieu1995/mealpy, Nguyen Van Thieu,nguyenthieu2102@gmail.com
     [2] https://github.com/7ossam81/EvoloPy, Hossam Faris etc., hossam.faris@ju.edu.jo (H. Faris)
-    [3] Storn, Rainer, and Kenneth Price. 1997. "Differential Evolution â€?A Simple and Efficient Heuristic for global Optimization over Continuous Spaces."
+    [3] Storn, Rainer, and Kenneth Price. 1997. "Differential Evolution ï¿½?A Simple and Efficient Heuristic for global Optimization over Continuous Spaces."
     Journal of Global Optimization 11 (4):341-59. doi: 10.1023/A:1008202821328.
     """
 
@@ -66,16 +66,12 @@ class DEBase(SingleObjectiveSwarmRoot[S, R]):
     def reproduction(self, mating_pool: List[S]) -> List[S]:
         number_of_parents = self.crossover_operator.get_number_of_parents()        
         offsprings = []
-        for i in range(0,self.offspring_population_size):
+        for i in range(0, self.offspring_population_size):
             parents = []
             for j in range(number_of_parents):
-                parents.append(population[i*number_of_parents + j])
-            self.crossover_operator.current_individual = self.solutions[i]
-            new_solutions = self.crossover_operator.execute(parents)
-            for solution in new_solutions:
-                offsprings.append(solution)
-                if len(offsprings) >= self.offspring_population_size:
-                    break
+                parents.append(mating_pool[i * number_of_parents + j])
+            new_solution = self.crossover_operator.execute(self.solutions[i], parents)
+            offsprings.append(new_solution)
         return offsprings
 
     def get_description(self) -> str:

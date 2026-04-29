@@ -8,6 +8,7 @@ Results for each instance are saved in the 'results/' subfolder.
 
 import sys
 import os
+import winsound
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', '..'))
 
 # Add CPLEX path to sys.path only if it's not already there
@@ -23,7 +24,6 @@ from typing import List, Dict, Tuple
 
 from evolureconfigurablealbp.problem.multiobjective.ReconfigurableALS_model import ReconfigurableALSPModel
 from evolureconfigurablealbp.problem.multiobjective.MO_ReconfigurableALS_problem import IntegerMOReconfigurableALSP
-
 
 def run_epsilon_constraint_pareto_frontier(file_name: str,
                                            file_path: str = "D:/GitHubInstances/Instances_RALSP/Instances/",
@@ -385,3 +385,9 @@ if __name__ == "__main__":
         for row in summary:
             writer.writerow([row['instance'], row['total_combinations'], row['valid_solutions'], row['optimal_solutions'], row['pareto_solutions'], f"{row['total_runtime_sec']:.2f}"])
     print(f"\nSummary saved to {summary_csv}")
+    # Play beep sound when execution completes (Windows only)
+    try:
+        winsound.Beep(440, 10000)  # Frequency 440Hz, duration 10000ms
+        print("End of beep.")
+    except Exception:
+        pass  # Ignore if winsound is not available on this platform

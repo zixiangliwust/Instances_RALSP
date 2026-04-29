@@ -53,18 +53,19 @@ class WOABase(SingleObjectiveSwarmRoot[S, R]):
             a = 2 * alpha * r1 - alpha  # Eq. (2.3) in the paper
             c = 2 * r2  # Eq. (2.4) in the paper
             b = 1  # parameters in Eq. (2.5)
+            l = - 2 * random.uniform(0.0, 1.0) + 1
+            p = random.uniform(0.0, 1.0)
             for i in range(self.problem.number_of_variables):
-                if random.uniform(0.0, 1.0) < 0.5:
+                if p < 0.5:
                     if abs(a) < 1:
                         d_leader = abs(c * self.g_best.variables[i] - self.solutions[j].variables[i])
                         offsprings[j].variables[i] = self.g_best.variables[i] - a * d_leader
                     elif abs(a) >= 1:
                         idx = random.randint(0, self.population_size - 1)
                         d_idx = abs(c * self.solutions[idx].variables[i] - self.solutions[j].variables[i])
-                        offsprings[j].variables[i] = self.solutions[idx].variables[i] - a * d_idx
+                        offsprings[j].variables[i] = offsprings[idx].variables[i] - a * d_idx
                 else:
-                    l = - 2 * random.uniform(0.0, 1.0) + 1  # parameters in Eq. (2.5)
-                    d_leader2 = abs(self.g_best.variables[i] - self.solutions[j].variables[i])  # Eq.(2.5)
+                    d_leader2 = abs(self.g_best.variables[i] - offsprings[j].variables[i])
                     offsprings[j].variables[i] = d_leader2 * math.exp(b * l) * math.cos(
                         l * 2 * math.pi) + self.g_best.variables[i]
         return offsprings
@@ -115,18 +116,19 @@ class WOAHI(WOABase):
             a = 2 * alpha * r1 - alpha  # Eq. (2.3) in the paper
             c = 2 * r2  # Eq. (2.4) in the paper
             b = 1  # parameters in Eq. (2.5)
+            l = - 2 * random.uniform(0.0, 1.0) + 1
+            p = random.uniform(0.0, 1.0)
             for i in range(self.problem.number_of_variables):
-                if random.uniform(0.0, 1.0) < 0.5:
+                if p < 0.5:
                     if abs(a) < 1:
-                        d_leader = abs(c * self.g_best.variables[i] - population[j].variables[i])
+                        d_leader = abs(c * self.g_best.variables[i] - self.solutions[j].variables[i])
                         offsprings[j].variables[i] = w * self.g_best.variables[i] - a * d_leader
                     elif abs(a) >= 1:
                         idx = random.randint(0, self.population_size - 1)
-                        d_idx = abs(c * population[idx].variables[i] - population[j].variables[i])
-                        offsprings[j].variables[i] = population[idx].variables[i] - a * d_idx
+                        d_idx = abs(c * self.solutions[idx].variables[i] - self.solutions[j].variables[i])
+                        offsprings[j].variables[i] = offsprings[idx].variables[i] - a * d_idx
                 else:
-                    l = - 2 * random.uniform(0.0, 1.0) + 1  # parameters in Eq. (2.5)
-                    d_leader2 = abs(self.g_best.variables[i] - population[j].variables[i])  # Eq.(2.5)
+                    d_leader2 = abs(self.g_best.variables[i] - offsprings[j].variables[i])
                     offsprings[j].variables[i] = w * self.g_best.variables[i] + d_leader2 * math.exp(b * l) * math.cos(
                         l * 2 * math.pi)
         return offsprings

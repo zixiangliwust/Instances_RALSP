@@ -56,7 +56,7 @@ class PSOBase(SingleObjectiveSwarmRoot[S, R]):
         self.r2_min = 0.0
         self.r2_max = 1.0
         self.w_min = 0.1
-        self.w_max = 0.5
+        self.w_max = 0.9
         self.v_max = []
         self.v_min = []
         self.velocity = np.zeros((self.population_size, self.problem.number_of_variables), dtype=float)
@@ -519,7 +519,7 @@ class DiscretePSO(SingleObjectiveSwarmRoot[S, R]):
         self.termination_criterion = termination_criterion
         self.observable.register(termination_criterion)
         self.w_k = 0.2
-        self.c1 = 0.1
+        self.c1 = 0.4
         self.local_best_solutions: List[S] = []
 
     def init_progress(self) -> None:

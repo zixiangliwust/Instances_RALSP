@@ -288,7 +288,20 @@ class ExperimentReport:
                         if self.is_single_objective:
                             if indicator_name == "FIT":
                                 indicator = FitnessValue()
-                                result = front_solutions[0].objectives[0]
+                                # Get all fitness values from the first solution
+                                fitness_values = front_solutions[0].objectives
+                                
+                                # Output multiple fitness values for single-objective with hierarchical objectives
+                                if len(fitness_values) > 1:
+                                    for fit_idx, fit_value in enumerate(fitness_values):
+                                        with open(summary_file_path, "a+") as of:
+                                            of.write(",".join([algorithm_name, problem_name, str(num_run), f"Fit{fit_idx + 1}", str(fit_value)]))
+                                            of.write("\n")
+                                else:
+                                    result = fitness_values[0]
+                                    with open(summary_file_path, "a+") as of:
+                                        of.write(",".join([algorithm_name, problem_name, str(num_run), "Fit", str(result)]))
+                                        of.write("\n")
                         else:
                             if Path(pareto_front_path).is_file():
                                 reference_front = []
@@ -320,12 +333,13 @@ class ExperimentReport:
                                 logger.warning(f"Unknown indicator {indicator_name} for {problem_name}")
                                 continue
                             result = indicator.compute(
-                                [front_solutions[i].objectives for i in range(len(front_solutions))])
-                        with open(summary_file_path, "a+") as of:
-                            of.write(
-                                ",".join([algorithm_name, problem_name, str(num_run), indicator_name,
-                                          str(result)]))
-                            of.write("\n")
+                                [front_solutions[i].objectives for i in range(len(front_solutions))])                            
+                            # Output quality indicator to summary file
+                            with open(summary_file_path, "a+") as of:
+                                of.write(",".join([algorithm_name, problem_name, str(num_run), indicator_name,
+                                                  str(result)]))
+                                of.write("\n")
+
 
     def generate_reference_fronts(self):
         for problem_name in self.problem_name_list:

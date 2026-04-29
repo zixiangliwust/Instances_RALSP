@@ -54,12 +54,12 @@ class SSOBase(SingleObjectiveSwarmRoot[S, R]):
                     c2 = random.random()
                     if random.random() < 0.5:
                         offsprings[j].variables[i] = self.g_best.variables[i] + c1 * (
-                                (self.problem.upper_bound[i] - self.problem.lower_bound[i]) * c2 +
-                                self.problem.lower_bound[i])
+                                (population[j].upper_bound[i] - population[j].lower_bound[i]) * c2 +
+                                population[j].lower_bound[i])
                     else:
                         offsprings[j].variables[i] = self.g_best.variables[i] - c1 * (
-                                (self.problem.upper_bound[i] - self.problem.lower_bound[i]) * c2 +
-                                self.problem.lower_bound[i])
+                                (population[j].upper_bound[i] - population[j].lower_bound[i]) * c2 +
+                                population[j].lower_bound[i])
             else:
                 # Eq. (3.4) in the paper
                 for i in range(0, self.problem.number_of_variables):

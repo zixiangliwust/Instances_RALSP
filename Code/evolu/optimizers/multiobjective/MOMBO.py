@@ -56,7 +56,7 @@ class MOMBO(MultiObjectiveSwarmRoot[S, R]):
         self.scout_time = 200
         self.offsprings = []
         self.para_k = 20  # Number of neighbors to generate
-        self.para_x = 10  # Number of neighbors to generate for followers
+        self.para_x = 5  # Number of neighbors to generate for followers
 
     def init_progress(self) -> None:
         logger.debug("Initializing progress...")
@@ -68,12 +68,12 @@ class MOMBO(MultiObjectiveSwarmRoot[S, R]):
             self.leaders_archive.add(solution)
 
     def leader_improvement(self) -> None:
-        neighbor = self.solutions[0]
+        neighbor = copy.deepcopy(self.solutions[0])
         for k in range(0, self.para_k):
             new_solution = self.mutation_operator.execute(neighbor)
             new_solution = self.evaluate_solution(new_solution)
             if self.comparator.compare(new_solution, neighbor) <= 0:
-                neighbor = new_solution
+                neighbor = copy.deepcopy(new_solution)
             if self.identical_solutions_comparator.compare(new_solution, self.solutions[0]) == 0:
                 for i in range(0, self.problem.number_of_objectives):
                     new_solution.objectives[i] = float("inf")
@@ -83,12 +83,12 @@ class MOMBO(MultiObjectiveSwarmRoot[S, R]):
 
     def population_improvement(self) -> None:
         for j in range(1, self.population_size, 2):
-            neighbor = self.solutions[j]
+            neighbor = copy.deepcopy(self.solutions[j])
             for k in range(self.para_x, self.para_k):
                 new_solution = self.mutation_operator.execute(neighbor)
                 new_solution = self.evaluate_solution(new_solution)
                 if self.comparator.compare(new_solution, neighbor) <= 0:
-                    neighbor = new_solution
+                    neighbor = copy.deepcopy(new_solution)
                 if self.identical_solutions_comparator.compare(new_solution, self.solutions[j]) == 0:
                     for i in range(0, self.problem.number_of_objectives):
                         new_solution.objectives[i] = float("inf")
@@ -96,12 +96,12 @@ class MOMBO(MultiObjectiveSwarmRoot[S, R]):
                     new_solution.survive_time = 0
                 self.offsprings.append(new_solution)
         for j in range(2, self.population_size, 2):
-            neighbor = self.solutions[j]
+            neighbor = copy.deepcopy(self.solutions[j])
             for k in range(self.para_x, self.para_k):
                 new_solution = self.mutation_operator.execute(neighbor)
                 new_solution = self.evaluate_solution(new_solution)
                 if self.comparator.compare(new_solution, neighbor) <= 0:
-                    neighbor = new_solution
+                    neighbor = copy.deepcopy(new_solution)
                 if self.identical_solutions_comparator.compare(new_solution, self.solutions[j]) == 0:
                     for i in range(0, self.problem.number_of_objectives):
                         new_solution.objectives[i] = float("inf")

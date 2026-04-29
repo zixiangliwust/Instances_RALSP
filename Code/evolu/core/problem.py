@@ -55,6 +55,9 @@ class Problem(Generic[S], ABC):
         self.labels: List[str] = []
         self.optimality_found: bool = False
         self.g_best: Optional[S] = None
+        self.p_best: Optional[S] = None
+        self.precision: List[int] = []
+        self.length: List[int] = []
 
     def get_number_of_objectives(self) -> int:
         """Get the number of objective functions.
@@ -115,6 +118,59 @@ class Problem(Generic[S], ABC):
 
     def get_name(self) -> str:
         return self.problem_name
+
+    def evaluate_constraints(self, solution: S) -> S:
+        """Evaluate constraints for a solution.
+        
+        Args:
+            solution (S): The solution to evaluate constraints for.
+        
+        Returns:
+            S: The solution with constraint values set.
+        
+        Note:
+            Subclasses can override this method to implement custom constraint evaluation.
+            Default implementation does nothing.
+        """
+        return solution
+
+    def evaluate_stop_constraints(self, solution: S) -> bool:
+        """Evaluate stopping constraints for a solution.
+        
+        Args:
+            solution (S): The solution to check.
+        
+        Returns:
+            bool: True if stopping constraints are met, False otherwise.
+        
+        Note:
+            Subclasses can override this method to implement custom stopping criteria.
+            Default implementation returns False.
+        """
+        return False
+
+    def get_number_of_bits(self) -> int:
+        """Get the number of bits (for binary representations).
+        
+        Returns:
+            int: Number of bits. Default is 0 for non-binary problems.
+        
+        Note:
+            Subclasses (e.g., BinaryArrayProblem) should override this method.
+        """
+        return 0
+
+    def check_solution(self, solution: S) -> None:
+        """Check solution validity.
+        
+        Args:
+            solution (S): The solution to check.
+        
+        Note:
+            Subclasses can override this method to implement custom validation logic.
+            Default implementation does nothing.
+        """
+        pass
 
 
 class FloatProblem(Problem[FloatSolution], ABC):
@@ -327,6 +383,34 @@ class IntegerProblem(Problem[IntegerSolution], ABC):
         )
         new_solution.variables = self.create_variables()
         return new_solution
+
+    def remedy_solution(self, solution: IntegerSolution) -> IntegerSolution:
+        """Repair solution variables to ensure they are within bounds and are integers.
+        
+        Clips any variables that are outside the allowed bounds to the nearest
+        bound value and rounds to nearest integer. This is useful for constraint 
+        handling when operators might generate out-of-bounds or non-integer values.
+        
+        Args:
+            solution (IntegerSolution): Solution to repair.
+        
+        Returns:
+            IntegerSolution: Solution with all variables clipped to bounds and rounded.
+        
+        Note:
+            Variables below lower_bound are set to lower_bound.
+            Variables above upper_bound are set to upper_bound.
+            All variables are rounded to nearest integer.
+        """
+        variables = copy.deepcopy(solution.variables)
+        for i in range(0, len(variables)):
+            if variables[i] < self.lower_bound[i]:
+                variables[i] = self.lower_bound[i]
+            if variables[i] > self.upper_bound[i]:
+                variables[i] = self.upper_bound[i]
+            variables[i] = round(variables[i])
+        solution.variables = variables
+        return solution
 
 
 class BinaryArrayProblem(Problem[BinaryArraySolution], ABC):

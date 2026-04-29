@@ -23,7 +23,7 @@ class ESBase(SingleObjectiveSwarmRoot[S, R]):
     [2] https://github.com/thieu1995/mealpy, Nguyen Van Thieu,nguyenthieu2102@gmail.com
     [3] Schwefel, H. P. 1984. "Evolution strategies: A family of non-linear optimization techniques based on imitating some principles of organic evolution."
     Annals of Operations Research 1 (2):165-7. doi: 10.1007/BF01876146.
-    [4] Beyer, Hans-Georg, and Hans-Paul Schwefel. 2002. "Evolution strategies â€?A comprehensive introduction."
+    [4] Beyer, Hans-Georg, and Hans-Paul Schwefel. 2002. "Evolution strategies ï¿½?A comprehensive introduction."
     Natural Computing 1 (1):3-52. doi: 10.1023/A:1015059928466.
     """
 
@@ -61,9 +61,8 @@ class ESBase(SingleObjectiveSwarmRoot[S, R]):
         return offsprings
 
     def replacement(self, population: List[S], offsprings: List[S]) -> List[S]:
-        population_pool = []
         if self.elitist:
-            population_pool = population
+            population_pool = population.copy()
             population_pool.extend(offsprings)
             population_pool = self.sort_population.execute(population_pool)
             new_solutions = []
@@ -71,11 +70,10 @@ class ESBase(SingleObjectiveSwarmRoot[S, R]):
                 new_solutions.append(population_pool[i])
             return new_solutions
         else:
-            population_pool.extend(offsprings)
-            population_pool = self.sort_population.execute(population_pool)
+            offsprings = self.sort_population.execute(offsprings)
             new_solutions = []
-            for j in range(0, len(population_pool)):
-                new_solutions.append(population_pool[j])
+            for j in range(0, len(offsprings)):
+                new_solutions.append(offsprings[j])
                 if len(new_solutions) >= self.population_size:
                     break
             if len(new_solutions) < self.population_size:

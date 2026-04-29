@@ -89,13 +89,13 @@ class DQNMOHH(MultiObjectiveSwarmRoot[S, R]):
         # Define state and action sets for DQN
         # Define actions (operators) - corresponding to the eight operator names
         self.action_set = [
-            "PSO_POSITION_UPDATE",      # For PSO_Position_Update
-            "PSO_PLUS_UNIFORM_MUTATION",  # For PSO_Plus_Uniform_Mutation
+            "PSO_POSITION_UPDATE",    # For PSO_Position_Update
+            "PSO_PLUS_UNIFORM_MUTATION",# For PSO_Plus_Uniform_Mutation
             "PSO_PLUS_NON_UNIFORM_MUTATION", # For PSO_Plus_Non_Uniform_Mutation
-            "TLBO_TEACHING_PHASE",      # For TLBO_Teaching_Phase
-            "TLBO_LEARNING_PHASE",      # For TLBO_Learning_Phase
-            "TLBO_MIXED_PHASE",         # For TLBO_Mixed_Phase
-            "WOA_OPERATOR",             # For WOA Operator
+            "TLBO_TEACHING_PHASE",    # For TLBO_Teaching_Phase
+            "TLBO_LEARNING_PHASE",    # For TLBO_Learning_Phase
+            "TLBO_MIXED_PHASE",       # For TLBO_Mixed_Phase
+            "WOA_OPERATOR",           # For WOA Operator
             "GWO_OPERATOR"            # For GWO Operator
         ]
         # Define state set based on algorithm progress (0.0 to 1.0)
@@ -113,8 +113,8 @@ class DQNMOHH(MultiObjectiveSwarmRoot[S, R]):
         
         # Initialize DQN
         self.dqn_agent = DQN(
-            state_dim=len(self.state_set),  # Use number of states as state dimension
-            action_dim=len(self.action_set),  # Use number of actions as action dimension
+            state_dim=len(self.state_set),# Use number of states as state dimension
+            action_dim=len(self.action_set),# Use number of actions as action dimension
             learning_rate=self.dqn_learning_rate,
             epsilon=self.epsilon_start,
             epsilon_min=self.epsilon_min,
@@ -489,8 +489,8 @@ class MOHHv1(MultiObjectiveSwarmRoot[S, R]):
         
         # Define actions (operators) - only 3 operators for MOHHv1
         self.action_set = [
-            "PSO_POSITION_UPDATE",      # For PSO_Position_Update
-            "PSO_PLUS_UNIFORM_MUTATION",  # For PSO_Plus_Uniform_Mutation
+            "PSO_POSITION_UPDATE",    # For PSO_Position_Update
+            "PSO_PLUS_UNIFORM_MUTATION",# For PSO_Plus_Uniform_Mutation
             "PSO_PLUS_NON_UNIFORM_MUTATION", # For PSO_Plus_Non_Uniform_Mutation
         ]
 
@@ -659,13 +659,13 @@ class MOHHv2(MultiObjectiveSwarmRoot[S, R]):
         
         # Define actions (operators) - all 8 operators but selected randomly
         self.action_set = [
-            "PSO_POSITION_UPDATE",      # For PSO_Position_Update
-            "PSO_PLUS_UNIFORM_MUTATION",  # For PSO_Plus_Uniform_Mutation
+            "PSO_POSITION_UPDATE",    # For PSO_Position_Update
+            "PSO_PLUS_UNIFORM_MUTATION",# For PSO_Plus_Uniform_Mutation
             "PSO_PLUS_NON_UNIFORM_MUTATION", # For PSO_Plus_Non_Uniform_Mutation
-            "TLBO_TEACHING_PHASE",      # For TLBO_Teaching_Phase
-            "TLBO_LEARNING_PHASE",      # For TLBO_Learning_Phase
-            "TLBO_MIXED_PHASE",         # For TLBO_Mixed_Phase
-            "WOA_OPERATOR",             # For WOA Operator
+            "TLBO_TEACHING_PHASE",    # For TLBO_Teaching_Phase
+            "TLBO_LEARNING_PHASE",    # For TLBO_Learning_Phase
+            "TLBO_MIXED_PHASE",       # For TLBO_Mixed_Phase
+            "WOA_OPERATOR",           # For WOA Operator
             "GWO_OPERATOR"            # For GWO Operator
         ]
 
@@ -973,13 +973,13 @@ class MOHHv3(MultiObjectiveSwarmRoot[S, R]):
         # Define state and action sets for DQN
         # Define actions (operators) - all 8 operators
         self.action_set = [
-            "PSO_POSITION_UPDATE",      # For PSO_Position_Update
-            "PSO_PLUS_UNIFORM_MUTATION",  # For PSO_Plus_Uniform_Mutation
+            "PSO_POSITION_UPDATE",    # For PSO_Position_Update
+            "PSO_PLUS_UNIFORM_MUTATION",# For PSO_Plus_Uniform_Mutation
             "PSO_PLUS_NON_UNIFORM_MUTATION", # For PSO_Plus_Non_Uniform_Mutation
-            "TLBO_TEACHING_PHASE",      # For TLBO_Teaching_Phase
-            "TLBO_LEARNING_PHASE",      # For TLBO_Learning_Phase
-            "TLBO_MIXED_PHASE",         # For TLBO_Mixed_Phase
-            "WOA_OPERATOR",             # For WOA Operator
+            "TLBO_TEACHING_PHASE",    # For TLBO_Teaching_Phase
+            "TLBO_LEARNING_PHASE",    # For TLBO_Learning_Phase
+            "TLBO_MIXED_PHASE",       # For TLBO_Mixed_Phase
+            "WOA_OPERATOR",           # For WOA Operator
             "GWO_OPERATOR"            # For GWO Operator
         ]
         # Define state set based on algorithm progress (0.0 to 1.0)
@@ -997,8 +997,8 @@ class MOHHv3(MultiObjectiveSwarmRoot[S, R]):
         
         # Initialize DQN
         self.dqn_agent = DQN(
-            state_dim=len(self.state_set),  # Use number of states as state dimension
-            action_dim=len(self.action_set),  # Use number of actions as action dimension
+            state_dim=len(self.state_set),# Use number of states as state dimension
+            action_dim=len(self.action_set),# Use number of actions as action dimension
             learning_rate=self.dqn_learning_rate,
             epsilon=self.epsilon_start,
             epsilon_min=self.epsilon_min,
@@ -1362,13 +1362,13 @@ class MOHHv4(MultiObjectiveSwarmRoot[S, R]):
         
         # Define actions (operators) - all 8 operators
         self.action_set = [
-            "PSO_POSITION_UPDATE",      # For PSO_Position_Update
-            "PSO_PLUS_UNIFORM_MUTATION",  # For PSO_Plus_Uniform_Mutation
+            "PSO_POSITION_UPDATE",    # For PSO_Position_Update
+            "PSO_PLUS_UNIFORM_MUTATION",# For PSO_Plus_Uniform_Mutation
             "PSO_PLUS_NON_UNIFORM_MUTATION", # For PSO_Plus_Non_Uniform_Mutation
-            "TLBO_TEACHING_PHASE",      # For TLBO_Teaching_Phase
-            "TLBO_LEARNING_PHASE",      # For TLBO_Learning_Phase
-            "TLBO_MIXED_PHASE",         # For TLBO_Mixed_Phase
-            "WOA_OPERATOR",             # For WOA Operator
+            "TLBO_TEACHING_PHASE",    # For TLBO_Teaching_Phase
+            "TLBO_LEARNING_PHASE",    # For TLBO_Learning_Phase
+            "TLBO_MIXED_PHASE",       # For TLBO_Mixed_Phase
+            "WOA_OPERATOR",           # For WOA Operator
             "GWO_OPERATOR"            # For GWO Operator
         ]
 
@@ -1684,13 +1684,13 @@ class QMOHH(MultiObjectiveSwarmRoot[S, R]):
         # Define state and action sets for Q-learning
         # Define actions (operators) - corresponding to the eight operator names
         self.action_set = [
-            "PSO_POSITION_UPDATE",      # For PSO_Position_Update
-            "PSO_PLUS_UNIFORM_MUTATION",  # For PSO_Plus_Uniform_Mutation
+            "PSO_POSITION_UPDATE",    # For PSO_Position_Update
+            "PSO_PLUS_UNIFORM_MUTATION",# For PSO_Plus_Uniform_Mutation
             "PSO_PLUS_NON_UNIFORM_MUTATION", # For PSO_Plus_Non_Uniform_Mutation
-            "TLBO_TEACHING_PHASE",      # For TLBO_Teaching_Phase
-            "TLBO_LEARNING_PHASE",      # For TLBO_Learning_Phase
-            "TLBO_MIXED_PHASE",         # For TLBO_Mixed_Phase
-            "WOA_OPERATOR",             # For WOA Operator
+            "TLBO_TEACHING_PHASE",    # For TLBO_Teaching_Phase
+            "TLBO_LEARNING_PHASE",    # For TLBO_Learning_Phase
+            "TLBO_MIXED_PHASE",       # For TLBO_Mixed_Phase
+            "WOA_OPERATOR",           # For WOA Operator
             "GWO_OPERATOR"            # For MOGWO Operator
         ]
         # Define state set based on algorithm progress (0.0 to 1.0)

@@ -26,7 +26,7 @@ class HCBase(SingleObjectiveSwarmRoot[S, R]):
     References:
     [1] Initial code built based on https://github.com/thieu1995/mealpy, Nguyen Van Thieu,nguyenthieu2102@gmail.com
     [2] Mitchell, Melanie, John H. Holland, and Stephanie Forrest. 1993. "When will a genetic algorithm outperform hill climbing?"
-    In Proceedings of the 6th International Conference on Neural Information Processing Systems, 51â€?. Denver, Colorado: Morgan Kaufmann Publishers Inc.
+    In Proceedings of the 6th International Conference on Neural Information Processing Systems, 51ï¿½?. Denver, Colorado: Morgan Kaufmann Publishers Inc.
     """
 
     def __init__(self,
@@ -38,7 +38,7 @@ class HCBase(SingleObjectiveSwarmRoot[S, R]):
                  ):
         super(HCBase, self).__init__(problem=problem)
         self.algorithm_name = "Hill climbing algorithm"
-        self.neighbor_size = 10
+        self.neighbor_size = 15
         self.neighbors = []
         self.offspring_population_size = self.neighbor_size
         self.mutation_operator = mutation
@@ -109,6 +109,7 @@ class LAHCBase(HCBase[S, R]):
                                        population_evaluator=population_evaluator,
                                        termination_criterion=termination_criterion)
         self.algorithm_name = "Late acceptance hill climbing algorithm"
+        self.neighbor_size = 10
 
     def initialization(self, population_size=None):
         self.start_computing_time = time.time()

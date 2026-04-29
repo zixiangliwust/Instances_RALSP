@@ -69,9 +69,9 @@ class OMOPSO(MultiObjectiveSwarmRoot[S, R]):
         self.epsilon_archive = NonDominatedSolutionsArchive(EpsilonDominanceComparator(epsilon))
         self.dominance_comparator = DominanceWithConstraintsComparator()
         self.c1_min = 1.5
-        self.c1_max = 2.0
+        self.c1_max = 2.5
         self.c2_min = 1.5
-        self.c2_max = 2.0
+        self.c2_max = 2.5
         self.r1_min = 0.0
         self.r1_max = 1.0
         self.r2_min = 0.0
@@ -136,8 +136,9 @@ class OMOPSO(MultiObjectiveSwarmRoot[S, R]):
         for i in range(self.population_size):
             if (i % 3) == 0:
                 population[i] = self.non_uniform_mutation.execute(population[i])
-            else:
+            elif (i % 3) == 1:
                 population[i] = self.uniform_mutation.execute(population[i])
+            # i % 3 == 2: no mutation applied (matches C++ behavior)
         return population
 
     def select_global_best(self) -> FloatSolution:

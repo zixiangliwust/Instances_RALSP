@@ -167,7 +167,7 @@ class IMOABC(MOABC[S, R]):
         # Note: MOABC parent class handles operator assignments properly
         self.algorithm_name = "Improved multi-objective artificial bee colony"
         self.crossover_operator = crossover
-        self.leaders_archive = NonDominatedSolutionsArchive(EpsilonDominanceComparator(0.0075))
+        self.leaders_archive = NonDominatedSolutionsArchive()
         self.scout_time = 200
 
     def init_progress(self) -> None:

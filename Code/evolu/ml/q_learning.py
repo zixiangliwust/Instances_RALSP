@@ -24,12 +24,12 @@ class QLearning:
     and the Q-table is updated using the Bellman equation.
     
     Attributes:
-        epsilon_greedy (float): Epsilon value for epsilon-greedy policy (exploration rate).
-            Higher values favor exploration over exploitation. Defaults to 0.8.
+        epsilon_greedy (float): Epsilon value for epsilon-greedy policy (exploitation rate).
+            Higher values favor exploitation over exploration. Defaults to 0.95.
         learning_rate (float): Learning rate (alpha) controlling how much new
-            information overrides old Q-values. Defaults to 0.4.
+            information overrides old Q-values. Defaults to 0.8.
         reward_decay (float): Discount factor (gamma) for future rewards.
-            Higher values give more weight to long-term rewards. Defaults to 0.85.
+            Higher values give more weight to long-term rewards. Defaults to 0.8.
         action_set (List[Any]): List of available actions (e.g., operator types).
         state_set (List[Any]): List of possible states.
         q_table (pd.DataFrame): Q-table storing Q-values for state-action pairs.
@@ -64,9 +64,9 @@ class QLearning:
             The Q-table is initialized with zeros, meaning all state-action pairs
             start with equal Q-values (tabula rasa learning).
         """
-        self.epsilon_greedy: float = 0.8
-        self.learning_rate: float = 0.4
-        self.reward_decay: float = 0.85
+        self.epsilon_greedy: float = 0.95
+        self.learning_rate: float = 0.8
+        self.reward_decay: float = 0.8
         self.action_set: List[Any] = action_set
         self.state_set: List[Any] = state_set
         self.q_table: pd.DataFrame = pd.DataFrame(

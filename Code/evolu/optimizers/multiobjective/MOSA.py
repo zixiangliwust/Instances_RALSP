@@ -46,7 +46,7 @@ class MSAA(MultiObjectiveSwarmRoot[S, R]):
         self.comparator = comparator
         self.termination_criterion = termination_criterion
         self.observable.register(termination_criterion)        
-        self.leaders_archive = NonDominatedSolutionsArchive(EpsilonDominanceComparator(0.0075))
+        self.leaders_archive = NonDominatedSolutionsArchive()
         self.result_archive = NonDominatedSolutionsArchive(EpsilonDominanceComparator(0.0075))
         self.temperature_start = 1.0
         self.temperature = self.temperature_start
@@ -81,7 +81,7 @@ class MSAA(MultiObjectiveSwarmRoot[S, R]):
             success = self.leaders_archive.add(new_solution)
             if success:
                 self.non_improvement_time = 0
-                self.solution = new_solution
+                self.solution = copy.deepcopy(new_solution)
             else:
                 objective_index = random.randint(0, self.solution.number_of_objectives - 1)
                 acceptance_probability = self.compute_acceptance_probability(
@@ -90,9 +90,9 @@ class MSAA(MultiObjectiveSwarmRoot[S, R]):
                 )
                 self.comparator = ObjectiveComparator(objective_index)
                 if self.comparator.compare(new_solution, self.solution) == -1:
-                    self.solution = new_solution
+                    self.solution = copy.deepcopy(new_solution)
                 elif acceptance_probability > random.random():
-                    self.solution = new_solution
+                    self.solution = copy.deepcopy(new_solution)
             self.restart()
         self.temperature *= self.cooling_rate
 
@@ -229,9 +229,9 @@ class IMRSA(MSAA[S, R]):
             success = self.leaders_archive.add(new_solution)
             if success:
                 self.non_improvement_time = 0
-                self.solution = new_solution
+                self.solution = copy.deepcopy(new_solution)
             else:
-                # IMRSA核心改进：对多个目标计算接受概率并相�?
+                # IMRSA核心改进：对多个目标计算接受概率并相�?
                 acceptance_probability = 1.0
                 # 对除最后一个外的所有目标计算接受概率并相乘
                 for objective_index in range(0, self.solution.number_of_objectives - 1):
@@ -241,7 +241,7 @@ class IMRSA(MSAA[S, R]):
                     )
                 
                 if acceptance_probability > random.random():
-                    self.solution = new_solution
+                    self.solution = copy.deepcopy(new_solution)
             self.restart()
         self.temperature *= self.cooling_rate
 

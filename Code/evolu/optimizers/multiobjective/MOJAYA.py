@@ -71,6 +71,8 @@ class MOJAYA(MultiObjectiveSwarmRoot[S, R]):
         for solution in self.solutions:
             self.leaders_archive.add(solution)
         self.leaders_archive.compute_density_estimator()
+        self.solutions = RankingAndDensityEstimatorSelection(len(self.solutions)).execute(self.solutions)
+        self.p_worst = copy.deepcopy(self.worst_solution_selection.execute(self.solutions)[0])
 
     def reproduction(self, population: List[S]) -> List[S]:
         offsprings = copy.deepcopy(population)

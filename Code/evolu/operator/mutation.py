@@ -21,6 +21,7 @@ moduleauthor:: Antonio J. Nebro <antonio@lcc.uma.es>, Antonio Benítez-Hidalgo <
 """
 
 
+
 class NullMutation(Mutation[Solution]):
     def __init__(self):
         super(NullMutation, self).__init__(probability=0)
@@ -38,104 +39,6 @@ class NullMutation(Mutation[Solution]):
         return "NullMutation"
 
 
-class FloatPermutationIntegerSwapMutation(Mutation[Solution]):
-    def __init__(self, probability: float = 1.0):
-        super(FloatPermutationIntegerSwapMutation, self).__init__(probability=probability)
-
-    def execute(self, parent: Solution) -> Solution:
-        child = copy.deepcopy(parent)
-        rand = random.random()
-        if rand <= self.probability:
-            if parent.number_of_variables >= 2:
-                idx1, idx2 = random.sample(range(parent.number_of_variables), 2)
-                number_of_times = 0
-                while parent.variables[idx1] == parent.variables[idx2]:
-                    idx1, idx2 = random.sample(range(parent.number_of_variables), 2)
-                    number_of_times += 1
-                    if number_of_times > parent.number_of_variables:
-                        break
-                child.variables[idx1], child.variables[idx2] = parent.variables[idx2], parent.variables[idx1]
-        return child
-
-    def get_name(self):
-        return "FloatPermutationIntegerSwapMutation"
-
-
-class FloatPermutationIntegerInsertionMutation(Mutation[Solution]):
-    def __init__(self, probability: float = 1.0):
-        super(FloatPermutationIntegerInsertionMutation, self).__init__(probability=probability)
-
-    def execute(self, parent: Solution) -> Solution:
-        child = copy.deepcopy(parent)
-        rand = random.random()
-        if rand <= self.probability:
-            number_of_variables = parent.number_of_variables
-            if number_of_variables >= 2:
-                temp_solution = copy.deepcopy(parent)
-                old_idx, new_idx = random.sample(range(0, number_of_variables), 2)
-                while old_idx == new_idx:
-                    old_idx, new_idx = random.sample(range(0, number_of_variables), 2)
-                for i in range(old_idx, number_of_variables):
-                    if i + 1 < number_of_variables:
-                        temp_solution.variables[i] = parent.variables[i + 1]
-                child.variables[new_idx] = parent.variables[old_idx]
-                for i in range(0, number_of_variables):
-                    if i < new_idx:
-                        child.variables[i] = temp_solution.variables[i]
-                    if i > new_idx:
-                        child.variables[i] = temp_solution.variables[i - 1]
-        return child
-
-    def get_name(self):
-        return "FloatPermutationIntegerInsertionMutation"
-
-
-class FloatPermutationIntegerInversionMutation(Mutation[Solution]):
-    def __init__(self, probability: float = 1.0):
-        super(FloatPermutationIntegerInversionMutation, self).__init__(probability=probability)
-
-    def execute(self, parent: Solution) -> Solution:
-        child = copy.deepcopy(parent)
-        rand = random.random()
-        if rand <= self.probability:
-            if parent.number_of_variables >= 2:
-                idx1, idx2 = random.sample(range(0, len(parent.variables)), 2)
-                while idx1 >= idx2:
-                    idx1, idx2 = random.sample(range(0, len(parent.variables)), 2)
-                    if idx1 > idx2:
-                        idx1, idx2 = idx2, idx1
-                temp_variable = child.variables[idx1: idx2]
-                temp_variable = temp_variable[::-1]
-                child.variables[idx1: idx2] = temp_variable
-        return child
-
-    def get_name(self):
-        return "FloatPermutationIntegerInversionMutation"
-
-
-class FloatPermutationIntegerScrambleMutation(Mutation[PermutationSolution]):
-    def __init__(self, probability: float = 1.0):
-        super(FloatPermutationIntegerScrambleMutation, self).__init__(probability=probability)
-
-    def execute(self, parent: PermutationSolution) -> PermutationSolution:
-        child = copy.deepcopy(parent)
-        rand = random.random()
-        if rand <= self.probability:
-            if parent.number_of_variables >= 2:
-                point1 = random.randint(0, parent.number_of_variables - 1)
-                point2 = random.randint(0, parent.number_of_variables - 2)
-                if point2 >= point1:
-                    point2 += 1
-                else:
-                    point1, point2 = point2, point1
-                if point2 - point1 >= 20:
-                    point2 = point1 + 20
-                values = child.variables[point1:point2]
-                child.variables[point1:point2] = random.sample(values, len(values))
-        return child
-
-    def get_name(self):
-        return "FloatPermutationIntegerScrambleMutation"
 
 
 class FloatPolynomialMutation(Mutation[FloatSolution]):
@@ -189,6 +92,8 @@ class FloatPolynomialMutation(Mutation[FloatSolution]):
         return "FloatPolynomialMutation"
 
 
+
+
 class FloatUniformMutation(Mutation[FloatSolution]):
     def __init__(self, probability: float, perturbation: float = 0.5):
         super(FloatUniformMutation, self).__init__(probability=probability)
@@ -216,6 +121,8 @@ class FloatUniformMutation(Mutation[FloatSolution]):
 
     def get_name(self):
         return "FloatUniformMutation"
+
+
 
 
 class FloatNonUniformMutation(Mutation[FloatSolution]):
@@ -254,6 +161,8 @@ class FloatNonUniformMutation(Mutation[FloatSolution]):
         return "FloatNonUniformMutation"
 
 
+
+
 class FloatSimpleFlipMutation(Mutation[Solution]):
     def __init__(self, probability=1.0):
         super(FloatSimpleFlipMutation, self).__init__(probability=probability)
@@ -273,6 +182,8 @@ class FloatSimpleFlipMutation(Mutation[Solution]):
         return "FloatSimpleFlipMutation"
 
 
+
+
 class FloatSimpleRandomMutation(Mutation[FloatSolution]):
     def __init__(self, probability: float):
         super(FloatSimpleRandomMutation, self).__init__(probability=probability)
@@ -290,6 +201,8 @@ class FloatSimpleRandomMutation(Mutation[FloatSolution]):
 
     def get_name(self):
         return "FloatSimpleRandomMutation"
+
+
 
 
 class FloatOppositionMutation(Mutation[Solution]):
@@ -315,8 +228,118 @@ class FloatOppositionMutation(Mutation[Solution]):
         return "FloatOppositionMutation"
 
 
+
+
+class FloatPermutationIntegerSwapMutation(Mutation[Solution]):
+    def __init__(self, probability: float = 1.0):
+        super(FloatPermutationIntegerSwapMutation, self).__init__(probability=probability)
+
+    def execute(self, parent: Solution) -> Solution:
+        child = copy.deepcopy(parent)
+        rand = random.random()
+        if rand <= self.probability:
+            if parent.number_of_variables >= 2:
+                idx1, idx2 = random.sample(range(parent.number_of_variables), 2)
+                number_of_times = 0
+                while parent.variables[idx1] == parent.variables[idx2]:
+                    idx1, idx2 = random.sample(range(parent.number_of_variables), 2)
+                    number_of_times += 1
+                    if number_of_times > parent.number_of_variables:
+                        break
+                child.variables[idx1], child.variables[idx2] = parent.variables[idx2], parent.variables[idx1]
+        return child
+
+    def get_name(self):
+        return "FloatPermutationIntegerSwapMutation"
+
+
+
+
+class FloatPermutationIntegerInsertionMutation(Mutation[Solution]):
+    def __init__(self, probability: float = 1.0):
+        super(FloatPermutationIntegerInsertionMutation, self).__init__(probability=probability)
+
+    def execute(self, parent: Solution) -> Solution:
+        child = copy.deepcopy(parent)
+        rand = random.random()
+        if rand <= self.probability:
+            number_of_variables = parent.number_of_variables
+            if number_of_variables >= 2:
+                temp_solution = copy.deepcopy(parent)
+                old_idx, new_idx = random.sample(range(0, number_of_variables), 2)
+                while old_idx == new_idx:
+                    old_idx, new_idx = random.sample(range(0, number_of_variables), 2)
+                for i in range(old_idx, number_of_variables):
+                    if i + 1 < number_of_variables:
+                        temp_solution.variables[i] = parent.variables[i + 1]
+                child.variables[new_idx] = parent.variables[old_idx]
+                for i in range(0, number_of_variables):
+                    if i < new_idx:
+                        child.variables[i] = temp_solution.variables[i]
+                    if i > new_idx:
+                        child.variables[i] = temp_solution.variables[i - 1]
+        return child
+
+    def get_name(self):
+        return "FloatPermutationIntegerInsertionMutation"
+
+
+
+
+class FloatPermutationIntegerInversionMutation(Mutation[Solution]):
+    def __init__(self, probability: float = 1.0):
+        super(FloatPermutationIntegerInversionMutation, self).__init__(probability=probability)
+
+    def execute(self, parent: Solution) -> Solution:
+        child = copy.deepcopy(parent)
+        rand = random.random()
+        if rand <= self.probability:
+            if parent.number_of_variables >= 2:
+                idx1, idx2 = random.sample(range(0, len(parent.variables)), 2)
+                while idx1 >= idx2:
+                    idx1, idx2 = random.sample(range(0, len(parent.variables)), 2)
+                    if idx1 > idx2:
+                        idx1, idx2 = idx2, idx1
+                temp_variable = child.variables[idx1: idx2]
+                temp_variable = temp_variable[::-1]
+                child.variables[idx1: idx2] = temp_variable
+        return child
+
+    def get_name(self):
+        return "FloatPermutationIntegerInversionMutation"
+
+
+
+
+class FloatPermutationIntegerScrambleMutation(Mutation[PermutationSolution]):
+    def __init__(self, probability: float = 1.0):
+        super(FloatPermutationIntegerScrambleMutation, self).__init__(probability=probability)
+
+    def execute(self, parent: PermutationSolution) -> PermutationSolution:
+        child = copy.deepcopy(parent)
+        rand = random.random()
+        if rand <= self.probability:
+            if parent.number_of_variables >= 2:
+                point1 = random.randint(0, parent.number_of_variables - 1)
+                point2 = random.randint(0, parent.number_of_variables - 2)
+                if point2 >= point1:
+                    point2 += 1
+                else:
+                    point1, point2 = point2, point1
+                if point2 - point1 >= 20:
+                    point2 = point1 + 20
+                values = child.variables[point1:point2]
+                child.variables[point1:point2] = random.sample(values, len(values))
+        return child
+
+    def get_name(self):
+        return "FloatPermutationIntegerScrambleMutation"
+
+
+
+
 class IntegerPolynomialMutation(Mutation[IntegerSolution]):
-    def __init__(self, probability: float, distribution_index: float = 0.20):
+    def __init__(self, probability: float, distribution_index: float = 20.0):
         super(IntegerPolynomialMutation, self).__init__(probability=probability)
         self.distribution_index = distribution_index
 
@@ -359,6 +382,8 @@ class IntegerPolynomialMutation(Mutation[IntegerSolution]):
         return "IntegerPolynomialMutation"
 
 
+
+
 class IntegerUniformMutation(Mutation[IntegerSolution]):
     def __init__(self, probability: float, perturbation: float = 0.5):
         super(IntegerUniformMutation, self).__init__(probability=probability)
@@ -381,6 +406,8 @@ class IntegerUniformMutation(Mutation[IntegerSolution]):
 
     def get_name(self):
         return "IntegerUniformMutation"
+
+
 
 
 class IntegerNonUniformMutation(Mutation[IntegerSolution]):
@@ -419,6 +446,8 @@ class IntegerNonUniformMutation(Mutation[IntegerSolution]):
         return "IntegerNonUniformMutation"
 
 
+
+
 class IntegerSimpleFlipMutation(Mutation[Solution]):
     def __init__(self, probability=1.0):
         super(IntegerSimpleFlipMutation, self).__init__(probability=probability)
@@ -429,16 +458,26 @@ class IntegerSimpleFlipMutation(Mutation[Solution]):
         rand = random.random()
         if rand <= self.probability:
             idx = random.randint(0, len(parent.variables) - 1)
-            value = child.lower_bound[idx] + (child.upper_bound[idx] - child.lower_bound[idx]) * random.random()
-            if value < child.lower_bound[idx]:
-                value = child.lower_bound[idx]
-            elif value > child.upper_bound[idx]:
-                value = child.upper_bound[idx]
-            child.variables[idx] = int(round(value))
+            original_value = child.variables[idx]
+            value = original_value
+            # Try up to 10 times to get a different value (matches C++ implementation)
+            for attempt in range(10):
+                value = child.lower_bound[idx] + (child.upper_bound[idx] - child.lower_bound[idx]) * random.random()
+                if value < child.lower_bound[idx]:
+                    value = child.lower_bound[idx]
+                elif value > child.upper_bound[idx]:
+                    value = child.upper_bound[idx]
+                if int(round(value)) != int(round(original_value)):
+                    break
+            # Only update if we found a different value
+            if int(round(value)) != int(round(original_value)):
+                child.variables[idx] = int(round(value))
         return child
 
     def get_name(self):
         return "IntegerSimpleFlipMutation"
+
+
 
 
 class IntegerSimpleRandomMutation(Mutation[IntegerSolution]):
@@ -461,6 +500,8 @@ class IntegerSimpleRandomMutation(Mutation[IntegerSolution]):
 
     def get_name(self):
         return "IntegerSimpleRandomMutation"
+
+
 
 
 class IntegerOppositionMutation(Mutation[Solution]):
@@ -487,6 +528,8 @@ class IntegerOppositionMutation(Mutation[Solution]):
         return "IntegerOppositionMutation"
 
 
+
+
 class BitFlipMutation(Mutation[BinaryArraySolution]):
     def __init__(self, probability: float):
         super(BitFlipMutation, self).__init__(probability=probability)
@@ -511,6 +554,109 @@ class BitFlipMutation(Mutation[BinaryArraySolution]):
 
     def get_name(self):
         return "BitFlipMutation"
+
+
+
+
+class AlternativeMutation(Mutation[Solution]):
+    """Alternative mutation operator that selects one mutation operator probabilistically."""
+    __EPS = 1.0e-14
+    
+    def __init__(self, mutation_operator_list: [Mutation]):
+        super(AlternativeMutation, self).__init__(probability=1.0)
+        Check.is_not_none(mutation_operator_list)
+        Check.collection_is_not_empty(mutation_operator_list)
+        self.mutation_operators_list = []
+        for operator in mutation_operator_list:
+            Check.that(issubclass(operator.__class__, Mutation), "Object is not a subclass of Mutation")
+            self.mutation_operators_list.append(operator)
+
+    def execute(self, parent: Solution) -> Solution:
+        """Select and execute one mutation operator using roulette wheel selection.
+        
+        Args:
+            parent (Solution): Parent solution to be mutated.
+            
+        Returns:
+            Solution: Mutated solution from selected operator.
+        """
+        Check.is_not_none(parent)
+        
+        # Build probability list from operators
+        probability_list = [op.probability for op in self.mutation_operators_list]
+        
+        # Roulette wheel selection
+        maximum = sum(probability_list)
+        rand_num = random.uniform(0.0, maximum)
+        value = 0.0
+        
+        for i in range(len(probability_list)):
+            value += probability_list[i]
+            if value >= rand_num:
+                return self.mutation_operators_list[i].execute(parent)
+        
+        # Fallback: return parent copy if no operator selected
+        return copy.deepcopy(parent)
+
+    def get_name(self) -> str:
+        return "AlternativeMutation"
+
+
+
+
+class AlternativeCompositeMutation(Mutation[CompositeSolution]):
+    """Alternative composite mutation that selects ONE component to mutate."""
+    __EPS = 1.0e-14
+    
+    def __init__(self, mutation_operator_list: [Mutation]):
+        super(AlternativeCompositeMutation, self).__init__(probability=1.0)
+        Check.is_not_none(mutation_operator_list)
+        Check.collection_is_not_empty(mutation_operator_list)
+        self.mutation_operators_list = []
+        for operator in mutation_operator_list:
+            Check.that(issubclass(operator.__class__, Mutation), "Object is not a subclass of Mutation")
+            self.mutation_operators_list.append(operator)
+
+    def execute(self, parent: CompositeSolution) -> CompositeSolution:
+        """Select one component to mutate, copy others unchanged.
+        
+        Args:
+            parent (CompositeSolution): Composite solution to mutate.
+            
+        Returns:
+            CompositeSolution: Mutated composite solution with one component changed.
+        """
+        Check.is_not_none(parent)
+        
+        mutated_solution_components = []
+        
+        # Build probability list from operators
+        probability_list = [op.probability for op in self.mutation_operators_list]
+        
+        # Roulette wheel selection to choose which component to mutate
+        maximum = sum(probability_list)
+        rand_num = random.uniform(0.0, maximum)
+        value = 0.0
+        
+        number_of_components = parent.number_of_variables
+        
+        for i in range(number_of_components):
+            value += probability_list[i]
+            if value >= rand_num:
+                # Mutate this component
+                mutated_solution_components.append(self.mutation_operators_list[i].execute(parent.sub_solutions[i]))
+                # Set rand_num to max to ensure no other component is selected
+                rand_num = float('inf')
+            else:
+                # Copy this component unchanged from parent
+                mutated_solution_components.append(copy.deepcopy(parent.sub_solutions[i]))
+        
+        return CompositeSolution(mutated_solution_components)
+
+    def get_name(self) -> str:
+        return "AlternativeCompositeMutation"
+
+
 
 
 class CompositeMutation(Mutation[Solution]):
@@ -544,6 +690,8 @@ class CompositeMutation(Mutation[Solution]):
 
     def get_name(self) -> str:
         return "CompositeMutation"
+
+
 
 
 class LevyFlightOperator(Mutation[FloatSolution]):
@@ -638,23 +786,3 @@ class LevyFlightOperator(Mutation[FloatSolution]):
         return "LevyFlightOperator"
 
 
-class LocalSearchOperator:
-    def __init__(self, probability=1.0, problem=None, mutation_operator=None, population_evaluator=None,
-                 solution_set=None):
-        super(LocalSearchOperator, self).__init__()
-        self.problem = problem
-        self.mutation_operator = mutation_operator
-        self.population_evaluator = population_evaluator
-        self.solution_set = solution_set
-
-    def create_neighbors_and_select_best(self, parent=None, neighbor_size=None):
-        neighbors = [self.problem.evaluate_solution(self.mutation_operator.execute(parent)) for _ in
-                     range(0, neighbor_size)]
-        neighbors = self.population_evaluator.evaluate(neighbors, self.problem)
-        return neighbors
-
-    def create_neighbors_and_replace_parent(self, parent=None, neighbor_size=None):
-        neighbors = [self.problem.evaluate_solution(self.mutation_operator.execute(parent)) for _ in
-                     range(0, neighbor_size)]
-        neighbors = self.population_evaluator.evaluate(neighbors, self.problem)
-        return neighbors

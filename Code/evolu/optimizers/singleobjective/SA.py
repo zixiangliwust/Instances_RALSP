@@ -135,7 +135,7 @@ class RSA(SABase[S, R]):
         self.temperature = self.temperature_start
         self.sub_max_iteration = 5
         self.minimum_temperature = 0.000001
-        self.cooling_rate = 0.95
+        self.cooling_rate = 0.98
         self.temperature_restart = 0.001
         self.non_improvement_time_limit = 100
         self.non_improvement_time = 0
@@ -211,7 +211,7 @@ class SAPopulation(SingleObjectiveSwarmRoot[S, R]):
         self.algorithm_name = "Population simulated annealing"
         self.temperature_start = 1.0
         self.temperature = self.temperature_start
-        self.sub_max_iteration = 5
+        self.sub_max_iteration = 1
         self.minimum_temperature = 0.000001
         self.cooling_rate = 0.95
         self.neighbor_num = 2

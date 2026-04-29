@@ -41,7 +41,7 @@ class GDE3(MultiObjectiveSwarmRoot[S, R]):
                  termination_criterion: TerminationCriterion = store.default_termination_criteria,
                  ):
         super(GDE3, self).__init__(problem=problem, population_size=population_size)
-        self.algorithm_name = "GDE3"
+        self.algorithm_name = "Generalized differential evolution"
         self.selection_operator = selection
         self.crossover_operator = crossover        
         self.dominance_comparator = dominance_comparator
@@ -70,16 +70,12 @@ class GDE3(MultiObjectiveSwarmRoot[S, R]):
     def reproduction(self, population: List[S]) -> List[S]:
         number_of_parents = self.crossover_operator.get_number_of_parents()        
         offsprings = []
-        for i in range(0,self.offspring_population_size):
+        for i in range(0, self.offspring_population_size):
             parents = []
             for j in range(number_of_parents):
-                parents.append(population[i*number_of_parents + j])
-            self.crossover_operator.current_individual = self.solutions[i]
-            new_solutions = self.crossover_operator.execute(parents)
-            for solution in new_solutions:
-                offsprings.append(solution)
-                if len(offsprings) >= self.offspring_population_size:
-                    break
+                parents.append(population[i * number_of_parents + j])
+            new_solution = self.crossover_operator.execute(self.solutions[i], parents)
+            offsprings.append(new_solution)
         return offsprings
     
     def get_description(self) -> str:

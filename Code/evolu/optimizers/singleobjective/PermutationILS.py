@@ -44,7 +44,7 @@ class PermutationIG(SingleObjectiveSwarmRoot[S, R]):
         self.comparator = comparator
         self.termination_criterion = termination_criterion
         self.observable.register(termination_criterion)
-        self.perturbation_num = 4
+        self.perturbation_num = 2
         self.temperature = 0.001
         self.perturbation_num = min(self.perturbation_num, self.number_of_variables - 1)
         self.solution = None
@@ -207,7 +207,7 @@ class PermutationILS(SingleObjectiveSwarmRoot[S, R]):
         self.termination_criterion = termination_criterion
         self.observable.register(termination_criterion)
         self.perturbation_num = 4
-        self.neighbor_size = 100
+        self.neighbor_size = 50
         self.solution = None
 
     def initialization(self) -> None:

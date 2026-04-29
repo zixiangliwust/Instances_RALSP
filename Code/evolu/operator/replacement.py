@@ -224,8 +224,9 @@ class GreedyPopulationRankingAndDensityEstimatorReplacement(Replacement[S]):
     def replace(self, solution_list: List[S], offspring_list: List[S]) -> List[S]:
         """Replace solutions using greedy pairwise comparison with ranking context.
         
-        Computes ranking and density estimation on the combined population,
-        then performs greedy pairwise comparison between parents and offspring.
+        Computes ranking and density estimation on the combined population to update
+        solution attributes, then performs greedy pairwise comparison between parents
+        and offspring using a MultiComparator that considers both ranking and density.
         
         Args:
             solution_list (List[S]): Current population (parent solutions).
@@ -233,18 +234,21 @@ class GreedyPopulationRankingAndDensityEstimatorReplacement(Replacement[S]):
         
         Returns:
             List[S]: Updated population after replacement, maintaining original size.
+        
+        Note:
+            The ranking and density computation updates solution attributes which are
+            then used by the MultiComparator for pairwise comparison. This is intentional
+            to ensure the comparator has access to rank and density information.
         """
         join_population = solution_list + offspring_list
-        size_of_the_result_list = len(solution_list) + len(offspring_list)
         self.ranking.compute_ranking(join_population)
+        # Compute density for all ranks to update solution attributes
         ranking_id = 0
-        result_list = []
-        while len(result_list) < size_of_the_result_list:
+        while ranking_id < self.ranking.get_number_of_sub_fronts():
             current_ranked_solutions = self.ranking.get_sub_front(ranking_id)
             self.density_estimator.compute_density_estimator(current_ranked_solutions)
-            if len(current_ranked_solutions) <= (size_of_the_result_list - len(result_list)):
-                result_list = result_list + current_ranked_solutions
-                ranking_id += 1
+            ranking_id += 1
+        # Greedy pairwise comparison using ranking and density information
         result_list = []
         for i in range(0, len(solution_list)):
             if self.comparator.compare(solution_list[i], offspring_list[i]) == -1:

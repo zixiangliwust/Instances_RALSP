@@ -112,9 +112,9 @@ Edit the script:
 ```python
 algorithm = MODQNHH(
     problem=problem,
-    population_size=100,        # Increase for more diversity
-    max_evaluations=25000,      # Increase for better convergence
-    dqn_learning_rate=0.001,    # Adjust learning speed
+    population_size=100,      # Increase for more diversity
+    max_evaluations=25000,    # Increase for better convergence
+    dqn_learning_rate=0.001,  # Adjust learning speed
     target_update_frequency=10  # Adjust stability vs. speed
 )
 ```

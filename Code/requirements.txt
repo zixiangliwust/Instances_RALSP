@@ -1,21 +1,69 @@
-# evolu Framework Dependencies
+# EvoSuite Python Dependencies
 # 
-# This file contains all dependencies including core and optional dependencies.
-# For a minimal installation, use requirements-core.txt instead.
-#
 # Installation options:
-# 1. Core only (minimal): pip install -r requirements-core.txt
-# 2. Full installation: pip install -r requirements.txt
-# 3. With optional features: pip install -r requirements-core.txt && pip install -r requirements-optional.txt
-# 4. Development: pip install -r requirements-dev.txt
+# 1. Full installation (recommended): pip install -r requirements.txt
+# 2. Development: pip install -r requirements.txt (includes dev dependencies)
+#
+# Version: 1.3.0
+# Last updated: 2026-03-31
 
-# Core dependencies (required)
--r requirements-core.txt
+# ==============================================================================
+# CORE DEPENDENCIES (Required)
+# ==============================================================================
 
-# Optional dependencies (recommended for full functionality)
-# Comment out any you don't need
--r requirements-optional.txt
+# Numerical computing
+numpy>=1.19.0,<3.0.0
 
-# Note: Some optional dependencies may require additional system dependencies:
-# - docplex: Requires CPLEX or compatible solver
-# - pyspark: Requires Java runtime environment (JRE)
+# Scientific computing
+scipy>=1.5.0,<2.0.0
+
+# Data manipulation
+pandas>=1.1.0,<3.0.0
+
+# Plotting
+matplotlib>=3.3.0,<4.0.0
+
+plotly
+tqdm
+
+# ==============================================================================
+# OPTIONAL DEPENDENCIES (Recommended for full functionality)
+# ==============================================================================
+
+# Mathematical Programming Models (MIP/CP)
+# Required for: DLBP1_Model, SALBP1_Model, UALBP1_Model, etc.
+# Only support up to Python 3.10 (CPLEX requires Python 3.10 or earlier)
+docplex>=2.20.204
+
+# Distributed Computing - PySpark
+# Required for: SparkEvaluator in evolu.util.evaluator
+# Note: Requires Java runtime environment (JRE)
+pyspark>=3.0.0
+
+# Distributed Computing - Dask
+# Required for: DaskEvaluator in evolu.util.evaluator
+dask>=2021.0.0
+
+# ==============================================================================
+# DEVELOPMENT DEPENDENCIES (Testing, linting, documentation)
+# ==============================================================================
+
+# Testing
+pytest>=6.0.0
+pytest-cov>=2.10.0
+
+# Code formatting
+black>=21.0.0
+
+# Linting
+flake8>=3.8.0
+
+# Type checking
+mypy>=0.800
+types-setuptools
+
+# Documentation generation
+sphinx>=4.0.0
+sphinx-rtd-theme>=1.0.0
+sphinxcontrib-napoleon>=0.7
+

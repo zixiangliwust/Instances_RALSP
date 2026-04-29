@@ -91,17 +91,17 @@ class FloatDifferentialEvolutionCrossover(Crossover[FloatSolution, FloatSolution
         self.F = F
         self.K = K
         self.DE_Variant = DE_Variant
-        self.current_individual: FloatSolution = None
 
-    def execute(self, parents: List[FloatSolution]) -> List[FloatSolution]:
+    def execute(self, current: FloatSolution, parents: List[FloatSolution]) -> FloatSolution:
         """Execute the differential evolution crossover.
 
         Args:
+            current (FloatSolution): The current individual being evolved.
             parents (List[FloatSolution]): List of three parent solutions used
                 to build the trial solution.
 
         Returns:
-            List[FloatSolution]: A list containing a single offspring solution.
+            FloatSolution: A single offspring solution.
 
         Raises:
             InvalidParentsException: If the number of parents is not the
@@ -112,7 +112,7 @@ class FloatDifferentialEvolutionCrossover(Crossover[FloatSolution, FloatSolution
             raise InvalidParentsException(
                 f"The number of parents is not {self.get_number_of_parents()}: {len(parents)}"
             )
-        child = copy.deepcopy(self.current_individual)
+        child = copy.deepcopy(current)
         number_of_variables = parents[0].number_of_variables
         rand = random.randint(0, number_of_variables - 1)
         if self.DE_Variant == "rand/1/bin" or self.DE_Variant == "best/1/bin":
@@ -141,8 +141,8 @@ class FloatDifferentialEvolutionCrossover(Crossover[FloatSolution, FloatSolution
                     pass
         elif self.DE_Variant == "current-to-rand/1" or self.DE_Variant == "current-to-best/1":
             for i in range(number_of_variables):
-                value = self.current_individual.variables[i] + self.K * (
-                        parents[2].variables[i] - self.current_individual.variables[i]) + self.F * (
+                value = current.variables[i] + self.K * (
+                        parents[2].variables[i] - current.variables[i]) + self.F * (
                                 parents[0].variables[i] - parents[1].variables[i])
                 if value < child.lower_bound[i]:
                     value = child.lower_bound[i]
@@ -152,8 +152,8 @@ class FloatDifferentialEvolutionCrossover(Crossover[FloatSolution, FloatSolution
         elif self.DE_Variant == "current-to-rand/1/bin" or self.DE_Variant == "current-to-best/1/bin":
             for i in range(number_of_variables):
                 if random.random() < self.CR or i == rand:
-                    value = self.current_individual.variables[i] + self.K * (
-                            parents[2].variables[i] - self.current_individual.variables[i]) + self.F * (
+                    value = current.variables[i] + self.K * (
+                            parents[2].variables[i] - current.variables[i]) + self.F * (
                                     parents[0].variables[i] - parents[1].variables[i])
                     if value < child.lower_bound[i]:
                         value = child.lower_bound[i]
@@ -166,8 +166,8 @@ class FloatDifferentialEvolutionCrossover(Crossover[FloatSolution, FloatSolution
             cr_local = self.CR
             for i in range(number_of_variables):
                 if random.random() < cr_local or i == rand:
-                    value = self.current_individual.variables[i] + self.K * (
-                            parents[2].variables[i] - self.current_individual.variables[i]) + self.F * (
+                    value = current.variables[i] + self.K * (
+                            parents[2].variables[i] - current.variables[i]) + self.F * (
                                     parents[0].variables[i] - parents[1].variables[i])
                     if value < child.lower_bound[i]:
                         value = child.lower_bound[i]
@@ -182,7 +182,7 @@ class FloatDifferentialEvolutionCrossover(Crossover[FloatSolution, FloatSolution
             raise InvalidVariantException(
                 f"DifferentialEvolutionCrossover.execute: Invalid DE_Variant '{self.DE_Variant}'"
             )
-        return [child]
+        return child
 
     def get_number_of_parents(self) -> int:
         return 3
@@ -194,36 +194,14 @@ class FloatDifferentialEvolutionCrossover(Crossover[FloatSolution, FloatSolution
         return "FloatDifferentialEvolutionCrossover"
 
 
-class FloatIntegerUniformCrossover(Crossover[FloatSolution, FloatSolution]):
-    def __init__(self):
-        super(FloatIntegerUniformCrossover, self).__init__(probability=1.0)
-
-    def execute(self, parents: List[FloatSolution]) -> List[FloatSolution]:
-        offsprings = copy.deepcopy(parents)
-        rand = random.random()
-        if rand <= self.probability:
-            for i in range(0, len(parents[0].variables)):
-                if random.random() < 0.5:
-                    offsprings[0].variables[i] = parents[0].variables[i]
-                    offsprings[1].variables[i] = parents[1].variables[i]
-                else:
-                    offsprings[0].variables[i] = parents[1].variables[i]
-                    offsprings[1].variables[i] = parents[0].variables[i]
-        return offsprings
-
-    def get_number_of_parents(self) -> int:
-        return 2
-
-    def get_number_of_children(self) -> int:
-        return 2
-
-    def get_name(self):
-        return "FloatIntegerUniformCrossover"
-
-
 class FloatArithmeticCrossover(Crossover[FloatSolution, FloatSolution]):
-    def __init__(self):
-        super(FloatArithmeticCrossover, self).__init__(probability=1.0)
+    """Arithmetic crossover for float solutions.
+    
+    This operator creates offspring as a weighted average of parent genes.
+    """
+    
+    def __init__(self, probability: float):
+        super(FloatArithmeticCrossover, self).__init__(probability=probability)
 
     def execute(self, parents: List[FloatSolution]) -> List[FloatSolution]:
         offsprings = copy.deepcopy(parents)
@@ -278,6 +256,7 @@ class FloatSimulatedBinaryCrossover(Crossover[FloatSolution, FloatSolution]):
         if rand <= self.probability:
             for i in range(parents[0].number_of_variables):
                 value_x1, value_x2 = parents[0].variables[i], parents[1].variables[i]
+                value_x1_initial, value_x2_initial = value_x1, value_x2
                 if random.random() <= 0.5:
                     if abs(value_x1 - value_x2) > self.__EPS:
                         if value_x1 < value_x2:
@@ -308,6 +287,11 @@ class FloatSimulatedBinaryCrossover(Crossover[FloatSolution, FloatSolution]):
                             c1 = upper_bound
                         if c2 > upper_bound:
                             c2 = upper_bound
+                        # NaN protection (matches C++ implementation)
+                        import math
+                        if math.isnan(c1) or math.isnan(c2):
+                            c1 = value_x1_initial
+                            c2 = value_x2_initial
                         if random.random() <= 0.5:
                             offsprings[0].variables[i] = c2
                             offsprings[1].variables[i] = c1
@@ -330,6 +314,455 @@ class FloatSimulatedBinaryCrossover(Crossover[FloatSolution, FloatSolution]):
 
     def get_name(self) -> str:
         return "FloatSimulatedBinaryCrossover"
+
+
+class FloatBlendAlphaCrossover(Crossover[FloatSolution, FloatSolution]):
+    """Blend-α crossover operator for float solutions.
+    
+    Blend-α (Blend Crossover with α) is a crossover operator for real-coded
+    genetic algorithms. It generates offspring in an extended interval around
+    the parent values.
+    
+    References:
+        Eshelman, L. J., & Schaffer, J. D. (1993). Real-coded genetic algorithms
+        and interval-schemata. Foundations of genetic algorithms, 2, 187-202.
+    """
+    
+    def __init__(self, probability: float, alpha: float = 0.5):
+        """Initialize Blend-α crossover operator.
+        
+        Args:
+            probability (float): Probability of applying crossover (0.0 to 1.0).
+            alpha (float): Expansion parameter. Higher values generate offspring
+                further from parents. Typical value is 0.5. Defaults to 0.5.
+        """
+        super(FloatBlendAlphaCrossover, self).__init__(probability=probability)
+        self.alpha = alpha
+        if alpha < 0:
+            from evolu.core.exceptions import InvalidParameterException
+            raise InvalidParameterException(
+                f"The alpha parameter is negative: {alpha}"
+            )
+    
+    def execute(self, parents: List[FloatSolution]) -> List[FloatSolution]:
+        """Apply Blend-α crossover to two float solutions.
+        
+        Args:
+            parents (List[FloatSolution]): Two parent solutions.
+            
+        Returns:
+            List[FloatSolution]: Two offspring generated by Blend-α crossover.
+        """
+        Check.that(issubclass(type(parents[0]), FloatSolution), "Solution type invalid")
+        Check.that(issubclass(type(parents[1]), FloatSolution), "Solution type invalid")
+        Check.that(len(parents) == 2, "The number of parents is not two: {}".format(len(parents)))
+        offsprings = copy.deepcopy(parents)
+        rand = random.random()
+        if rand <= self.probability:
+            for i in range(parents[0].number_of_variables):
+                x1, x2 = parents[0].variables[i], parents[1].variables[i]
+                d = abs(x1 - x2)
+                x_min = min(x1, x2)
+                x_max = max(x1, x2)
+                # Extended interval
+                lower = x_min - self.alpha * d
+                upper = x_max + self.alpha * d
+                # Clip to bounds
+                lower = max(lower, parents[0].lower_bound[i])
+                upper = min(upper, parents[0].upper_bound[i])
+                # Generate two offspring
+                offsprings[0].variables[i] = random.uniform(lower, upper)
+                offsprings[1].variables[i] = random.uniform(lower, upper)
+        return offsprings
+    
+    def get_number_of_parents(self) -> int:
+        return 2
+    
+    def get_number_of_children(self) -> int:
+        return 2
+    
+    def get_name(self) -> str:
+        return "FloatBlendAlphaCrossover"
+
+
+class FloatBlendAlphaBetaCrossover(Crossover[FloatSolution, FloatSolution]):
+    """Blend-αβ crossover operator for float solutions.
+    
+    Blend-αβ is an extension of Blend-α that uses two parameters (α and β) to
+    control the expansion on both sides of the parent interval independently.
+    
+    References:
+        Deep, K., & Thakur, M. (2007). A new crossover operator for real coded
+        genetic algorithms. Applied Mathematics and Computation, 188(1), 895-911.
+    """
+    
+    def __init__(self, probability: float, alpha: float = 0.5, beta: float = 0.5):
+        """Initialize Blend-αβ crossover operator.
+        
+        Args:
+            probability (float): Probability of applying crossover (0.0 to 1.0).
+            alpha (float): Expansion parameter for the lower side. Defaults to 0.5.
+            beta (float): Expansion parameter for the upper side. Defaults to 0.5.
+        """
+        super(FloatBlendAlphaBetaCrossover, self).__init__(probability=probability)
+        self.alpha = alpha
+        self.beta = beta
+        if alpha < 0 or beta < 0:
+            from evolu.core.exceptions import InvalidParameterException
+            raise InvalidParameterException(
+                f"The alpha or beta parameter is negative: alpha={alpha}, beta={beta}"
+            )
+    
+    def execute(self, parents: List[FloatSolution]) -> List[FloatSolution]:
+        """Apply Blend-αβ crossover to two float solutions.
+        
+        Args:
+            parents (List[FloatSolution]): Two parent solutions.
+            
+        Returns:
+            List[FloatSolution]: Two offspring generated by Blend-αβ crossover.
+        """
+        Check.that(issubclass(type(parents[0]), FloatSolution), "Solution type invalid")
+        Check.that(issubclass(type(parents[1]), FloatSolution), "Solution type invalid")
+        Check.that(len(parents) == 2, "The number of parents is not two: {}".format(len(parents)))
+        offsprings = copy.deepcopy(parents)
+        rand = random.random()
+        if rand <= self.probability:
+            for i in range(parents[0].number_of_variables):
+                x1, x2 = parents[0].variables[i], parents[1].variables[i]
+                d = abs(x1 - x2)
+                x_min = min(x1, x2)
+                x_max = max(x1, x2)
+                # Extended interval with independent parameters
+                lower = x_min - self.alpha * d
+                upper = x_max + self.beta * d
+                # Clip to bounds
+                lower = max(lower, parents[0].lower_bound[i])
+                upper = min(upper, parents[0].upper_bound[i])
+                # Generate two offspring
+                offsprings[0].variables[i] = random.uniform(lower, upper)
+                offsprings[1].variables[i] = random.uniform(lower, upper)
+        return offsprings
+    
+    def get_number_of_parents(self) -> int:
+        return 2
+    
+    def get_number_of_children(self) -> int:
+        return 2
+    
+    def get_name(self) -> str:
+        return "FloatBlendAlphaBetaCrossover"
+
+
+class FloatMultiPointCrossover(Crossover[FloatSolution, FloatSolution]):
+    """Multi-point crossover operator for float solutions.
+    
+    This is a generalized version of one-point and two-point crossover that
+    allows any number of crossover points. It divides the variables into
+    segments and alternates between parents for each segment.
+    
+    Args:
+        probability (float): Probability of applying crossover.
+        number_of_points (int): Number of crossover points. Must be at least 1
+            and less than the number of variables.
+    """
+    
+    def __init__(self, probability: float, number_of_points: int = 2):
+        super(FloatMultiPointCrossover, self).__init__(probability=probability)
+        self.number_of_points = number_of_points
+        if number_of_points < 1:
+            from evolu.core.exceptions import InvalidParameterException
+            raise InvalidParameterException(
+                f"The number of points must be at least 1: {number_of_points}"
+            )
+    
+    def execute(self, parents: List[FloatSolution]) -> List[FloatSolution]:
+        """Apply Multi-point crossover to two float solutions.
+        
+        Args:
+            parents (List[FloatSolution]): Two parent solutions.
+            
+        Returns:
+            List[FloatSolution]: Two offspring generated by Multi-point crossover.
+        """
+        Check.that(issubclass(type(parents[0]), FloatSolution), "Solution type invalid")
+        Check.that(issubclass(type(parents[1]), FloatSolution), "Solution type invalid")
+        Check.that(len(parents) == 2, "The number of parents is not two: {}".format(len(parents)))
+        offsprings = copy.deepcopy(parents)
+        rand = random.random()
+        if rand <= self.probability:
+            n_vars = parents[0].number_of_variables
+            if n_vars > self.number_of_points:
+                # Select crossover points
+                points = sorted(random.sample(range(1, n_vars), min(self.number_of_points, n_vars - 1)))
+                points = [0] + points + [n_vars]
+                # Alternate between parents for each segment
+                for seg in range(len(points) - 1):
+                    start = points[seg]
+                    end = points[seg + 1]
+                    if seg % 2 == 0:
+                        # First parent's segment
+                        for i in range(start, end):
+                            offsprings[0].variables[i] = parents[0].variables[i]
+                            offsprings[1].variables[i] = parents[1].variables[i]
+                    else:
+                        # Second parent's segment
+                        for i in range(start, end):
+                            offsprings[0].variables[i] = parents[1].variables[i]
+                            offsprings[1].variables[i] = parents[0].variables[i]
+        return offsprings
+    
+    def get_number_of_parents(self) -> int:
+        return 2
+    
+    def get_number_of_children(self) -> int:
+        return 2
+    
+    def get_name(self) -> str:
+        return "FloatMultiPointCrossover"
+
+
+class FloatSinglePointPolynomialCrossover(Crossover[FloatSolution, FloatSolution]):
+    """Single-Point Polynomial (SPX) crossover operator for float solutions.
+    
+    SPX is a variant of SBX (Simulated Binary Crossover) that uses a single crossover point and applies
+    polynomial distribution only at that point, while other variables are
+    directly copied from parents.
+    
+    References:
+        Deb, K., & Agrawal, R. B. (1995). Simulated binary crossover for
+        continuous search space. Complex systems, 9(2), 115-148.
+    """
+    __EPS = 1.0e-14
+    
+    def __init__(self, probability: float, distribution_index: float = 20.0):
+        """Initialize Single-Point Polynomial crossover operator.
+        
+        Args:
+            probability (float): Probability of applying crossover.
+            distribution_index (float): Distribution index controlling the spread.
+                Higher values produce offspring closer to parents. Defaults to 20.0.
+        """
+        super(FloatSinglePointPolynomialCrossover, self).__init__(probability=probability)
+        self.distribution_index = distribution_index
+        if distribution_index < 0:
+            from evolu.core.exceptions import InvalidParameterException
+            raise InvalidParameterException(
+                f"The distribution index is negative: {distribution_index}"
+            )
+    
+    def execute(self, parents: List[FloatSolution]) -> List[FloatSolution]:
+        """Apply Single-Point Polynomial crossover to two float solutions.
+        
+        Args:
+            parents (List[FloatSolution]): Two parent solutions.
+            
+        Returns:
+            List[FloatSolution]: Two offspring generated by Single-Point Polynomial crossover.
+        """
+        Check.that(issubclass(type(parents[0]), FloatSolution), "Solution type invalid")
+        Check.that(issubclass(type(parents[1]), FloatSolution), "Solution type invalid")
+        Check.that(len(parents) == 2, "The number of parents is not two: {}".format(len(parents)))
+        offsprings = copy.deepcopy(parents)
+        rand = random.random()
+        if rand <= self.probability:
+            n_vars = parents[0].number_of_variables
+            if n_vars > 1:
+                # Select single crossover point
+                crossover_point = random.randint(0, n_vars - 1)
+                # Apply polynomial crossover at the crossover point
+                i = crossover_point
+                value_x1, value_x2 = parents[0].variables[i], parents[1].variables[i]
+                if abs(value_x1 - value_x2) > self.__EPS:
+                    if value_x1 < value_x2:
+                        y1, y2 = value_x1, value_x2
+                    else:
+                        y1, y2 = value_x2, value_x1
+                    lower_bound = parents[0].lower_bound[i]
+                    upper_bound = parents[0].upper_bound[i]
+                    beta = 1.0 + (2.0 * (y1 - lower_bound) / (y2 - y1))
+                    alpha = 2.0 - pow(beta, -(self.distribution_index + 1.0))
+                    rand = random.random()
+                    if rand <= (1.0 / alpha):
+                        betaq = pow(rand * alpha, (1.0 / (self.distribution_index + 1.0)))
+                    else:
+                        betaq = pow(1.0 / (2.0 - rand * alpha), 1.0 / (self.distribution_index + 1.0))
+                    c1 = 0.5 * (y1 + y2 - betaq * (y2 - y1))
+                    beta = 1.0 + (2.0 * (upper_bound - y2) / (y2 - y1))
+                    alpha = 2.0 - pow(beta, -(self.distribution_index + 1.0))
+                    if rand <= (1.0 / alpha):
+                        betaq = pow((rand * alpha), (1.0 / (self.distribution_index + 1.0)))
+                    else:
+                        betaq = pow(1.0 / (2.0 - rand * alpha), 1.0 / (self.distribution_index + 1.0))
+                    c2 = 0.5 * (y1 + y2 + betaq * (y2 - y1))
+                    if c1 < lower_bound:
+                        c1 = lower_bound
+                    if c2 < lower_bound:
+                        c2 = lower_bound
+                    if c1 > upper_bound:
+                        c1 = upper_bound
+                    if c2 > upper_bound:
+                        c2 = upper_bound
+                    if random.random() <= 0.5:
+                        offsprings[0].variables[i] = c2
+                        offsprings[1].variables[i] = c1
+                    else:
+                        offsprings[0].variables[i] = c1
+                        offsprings[1].variables[i] = c2
+                # Copy other variables from parents
+                for j in range(n_vars):
+                    if j != crossover_point:
+                        if random.random() <= 0.5:
+                            offsprings[0].variables[j] = parents[0].variables[j]
+                            offsprings[1].variables[j] = parents[1].variables[j]
+                        else:
+                            offsprings[0].variables[j] = parents[1].variables[j]
+                            offsprings[1].variables[j] = parents[0].variables[j]
+        return offsprings
+    
+    def get_number_of_parents(self) -> int:
+        return 2
+    
+    def get_number_of_children(self) -> int:
+        return 2
+    
+    def get_name(self) -> str:
+        return "FloatSinglePointPolynomialCrossover"
+
+
+class FloatIntegerOnePointCrossover(Crossover[FloatSolution, FloatSolution]):
+    """One-point crossover for float and integer solutions.
+    
+    This operator selects a single crossover point and exchanges the genes
+    after that point between the two parents.
+    """
+    
+    def __init__(self, probability: float):
+        super(FloatIntegerOnePointCrossover, self).__init__(probability=probability)
+    
+    def execute(self, parents: List[FloatSolution]) -> List[FloatSolution]:
+        """Apply one-point crossover to two parent solutions.
+        
+        Args:
+            parents (List[FloatSolution]): Two parent solutions.
+        
+        Returns:
+            List[FloatSolution]: Two offspring solutions.
+        """
+        if len(parents) != 2:
+            raise InvalidParentsException(
+                f"The number of parents is not two: {len(parents)}"
+            )
+        offsprings = copy.deepcopy(parents)
+        rand = random.random()
+        if rand <= self.probability:
+            if parents[0].number_of_variables > 2:
+                crossover_point = random.randint(1, parents[0].number_of_variables - 2)
+                for i in range(0, crossover_point):
+                    offsprings[0].variables[i] = parents[0].variables[i]
+                    offsprings[1].variables[i] = parents[1].variables[i]
+                for i in range(crossover_point, parents[0].number_of_variables):
+                    offsprings[0].variables[i] = parents[1].variables[i]
+                    offsprings[1].variables[i] = parents[0].variables[i]
+        return offsprings
+    
+    def get_number_of_parents(self) -> int:
+        return 2
+    
+    def get_number_of_children(self) -> int:
+        return 2
+    
+    def get_name(self) -> str:
+        return "FloatIntegerOnePointCrossover"
+
+
+class FloatIntegerTwoPointCrossover(Crossover[FloatSolution, FloatSolution]):
+    """Two-point crossover for float and integer solutions.
+    
+    This operator selects two crossover points and exchanges the genes
+    between those points between the two parents.
+    """
+    
+    def __init__(self, probability: float):
+        super(FloatIntegerTwoPointCrossover, self).__init__(probability=probability)
+    
+    def execute(self, parents: List[FloatSolution]) -> List[FloatSolution]:
+        """Apply two-point crossover to two parent solutions.
+        
+        Args:
+            parents (List[FloatSolution]): Two parent solutions.
+        
+        Returns:
+            List[FloatSolution]: Two offspring solutions.
+        """
+        if len(parents) != 2:
+            raise InvalidParentsException(
+                f"The number of parents is not two: {len(parents)}"
+            )
+        offsprings = copy.deepcopy(parents)
+        rand = random.random()
+        if rand <= self.probability:
+            if parents[0].number_of_variables > 2:
+                idx1 = random.randint(1, parents[0].number_of_variables - 2)
+                idx2 = random.randint(1, parents[0].number_of_variables - 2)
+                if idx1 == idx2:
+                    idx1 = random.randint(1, parents[0].number_of_variables - 2)
+                    idx2 = random.randint(1, parents[0].number_of_variables - 2)
+                
+                crossover_point1 = min(idx1, idx2)
+                crossover_point2 = max(idx1, idx2)
+                
+                for i in range(0, crossover_point1):
+                    offsprings[0].variables[i] = parents[0].variables[i]
+                    offsprings[1].variables[i] = parents[1].variables[i]
+                for i in range(crossover_point1, crossover_point2):
+                    offsprings[0].variables[i] = parents[1].variables[i]
+                    offsprings[1].variables[i] = parents[0].variables[i]
+                for i in range(crossover_point2, parents[0].number_of_variables):
+                    offsprings[0].variables[i] = parents[0].variables[i]
+                    offsprings[1].variables[i] = parents[1].variables[i]
+        return offsprings
+    
+    def get_number_of_parents(self) -> int:
+        return 2
+    
+    def get_number_of_children(self) -> int:
+        return 2
+    
+    def get_name(self) -> str:
+        return "FloatIntegerTwoPointCrossover"
+
+
+class FloatIntegerUniformCrossover(Crossover[FloatSolution, FloatSolution]):
+    """Uniform crossover for float and integer solutions.
+    
+    This operator exchanges each gene between parents with equal probability (0.5).
+    """
+    
+    def __init__(self, probability: float):
+        super(FloatIntegerUniformCrossover, self).__init__(probability=probability)
+
+    def execute(self, parents: List[FloatSolution]) -> List[FloatSolution]:
+        offsprings = copy.deepcopy(parents)
+        rand = random.random()
+        if rand <= self.probability:
+            for i in range(0, len(parents[0].variables)):
+                if random.random() < 0.5:
+                    offsprings[0].variables[i] = parents[0].variables[i]
+                    offsprings[1].variables[i] = parents[1].variables[i]
+                else:
+                    offsprings[0].variables[i] = parents[1].variables[i]
+                    offsprings[1].variables[i] = parents[0].variables[i]
+        return offsprings
+
+    def get_number_of_parents(self) -> int:
+        return 2
+
+    def get_number_of_children(self) -> int:
+        return 2
+
+    def get_name(self):
+        return "FloatIntegerUniformCrossover"
 
 
 class PermutationOnePointCrossover(Crossover[PermutationSolution, PermutationSolution]):
@@ -509,7 +942,7 @@ class PermutationCycleCrossover(Crossover[PermutationSolution, PermutationSoluti
             raise InvalidParentsException(
                 f"The number of parents is not two: {len(parents)}"
             )
-        offsprings = copy.deepcopy(parents[::-1])
+        offsprings = copy.deepcopy(parents) 
         rand = random.random()
         if rand <= self.probability:
             idx = random.randint(0, parents[0].number_of_variables - 1)
@@ -722,8 +1155,8 @@ class RepeatedPermutationTwoPointCrossover(Crossover[Solution, Solution]):
 
 
 class IntegerArithmeticCrossover(Crossover[FloatSolution, FloatSolution]):
-    def __init__(self):
-        super(IntegerArithmeticCrossover, self).__init__(probability=1.0)
+    def __init__(self, probability: float):
+        super(IntegerArithmeticCrossover, self).__init__(probability=probability)
 
     def execute(self, parents: List[FloatSolution]) -> List[FloatSolution]:
         offsprings = copy.deepcopy(parents)
@@ -794,9 +1227,19 @@ class IntegerSimulatedBinaryCrossover(Crossover[IntegerSolution, IntegerSolution
                         if c2 > upper_bound:
                             c2 = upper_bound
                         if random.random() <= 0.5:
+                            # NaN protection (matches C++ implementation)
+                            import math
+                            if math.isnan(c1) or math.isnan(c2):
+                                c1 = value_x1
+                                c2 = value_x2
                             offsprings[0].variables[i] = int(c2)
                             offsprings[1].variables[i] = int(c1)
                         else:
+                            # NaN protection (matches C++ implementation)
+                            import math
+                            if math.isnan(c1) or math.isnan(c2):
+                                c1 = value_x1
+                                c2 = value_x2
                             offsprings[0].variables[i] = int(c1)
                             offsprings[1].variables[i] = int(c2)
                     else:
@@ -905,6 +1348,146 @@ class BinaryArrayHalfUniformCrossover(Crossover[BinaryArraySolution, BinaryArray
         return "BinaryArrayHalfUniformCrossover"
 
 
+class AlternativeCrossover(Crossover[Solution, Solution]):
+    """Alternative crossover operator that selects one crossover operator probabilistically.
+    
+    This operator maintains a list of crossover operators and selects one to apply
+    based on their probabilities (roulette wheel selection).
+    """
+    __EPS = 1.0e-14
+    
+    def __init__(self, crossover_operator_list: List[Crossover]):
+        """Initialize AlternativeCrossover with a list of crossover operators.
+        
+        Args:
+            crossover_operator_list (List[Crossover]): List of crossover operators to choose from.
+        """
+        super(AlternativeCrossover, self).__init__(probability=1.0)
+        Check.is_not_none(crossover_operator_list)
+        Check.collection_is_not_empty(crossover_operator_list)
+        self.crossover_operators_list = []
+        for operator in crossover_operator_list:
+            Check.that(issubclass(operator.__class__, Crossover), "Object is not a subclass of Crossover")
+            self.crossover_operators_list.append(operator)
+
+    def execute(self, parents: List[Solution]) -> List[Solution]:
+        """Select and apply one crossover operator based on probabilities.
+        
+        Uses roulette wheel selection to choose which crossover operator to apply.
+        
+        Args:
+            parents (List[Solution]): Two parent solutions.
+            
+        Returns:
+            List[Solution]: Two offspring from the selected crossover operator.
+        """
+        Check.is_not_none(parents)
+        Check.that(len(parents) == 2, "The number of parents is not two: " + str(len(parents)))
+        
+        # Build probability list from operators
+        probability_list = [op.probability for op in self.crossover_operators_list]
+        
+        # Roulette wheel selection
+        maximum = sum(probability_list)
+        rand_num = random.uniform(0.0, maximum)
+        value = 0.0
+        
+        for i in range(len(probability_list)):
+            value += probability_list[i]
+            if value >= rand_num:
+                return self.crossover_operators_list[i].execute(parents)
+        
+        # Fallback (should not reach here)
+        return parents
+
+    def get_number_of_parents(self) -> int:
+        return 2
+
+    def get_number_of_children(self) -> int:
+        return 2
+
+    def get_name(self) -> str:
+        return "AlternativeCrossover"
+
+
+class AlternativeCompositeCrossover(Crossover[CompositeSolution, CompositeSolution]):
+    """Alternative composite crossover that selects ONE component to crossover.
+    
+    This operator applies crossover to only ONE randomly selected component solution
+    (based on operator probabilities), while copying all other components unchanged.
+    """
+    __EPS = 1.0e-14
+    
+    def __init__(self, crossover_operator_list: List[Crossover]):
+        """Initialize AlternativeCompositeCrossover with a list of crossover operators.
+        
+        Args:
+            crossover_operator_list (List[Crossover]): List of crossover operators,
+                one for each component of the composite solution.
+        """
+        super(AlternativeCompositeCrossover, self).__init__(probability=1.0)
+        Check.is_not_none(crossover_operator_list)
+        Check.collection_is_not_empty(crossover_operator_list)
+        self.crossover_operators_list = []
+        for operator in crossover_operator_list:
+            Check.that(issubclass(operator.__class__, Crossover), "Object is not a subclass of Crossover")
+            self.crossover_operators_list.append(operator)
+
+    def execute(self, parents: List[CompositeSolution]) -> List[CompositeSolution]:
+        """Apply crossover to ONE component, copy others unchanged.
+        
+        Selects one component probabilistically and applies its crossover operator.
+        All other components are copied directly from parents.
+        
+        Args:
+            parents (List[CompositeSolution]): Two composite parent solutions.
+            
+        Returns:
+            List[CompositeSolution]: Two composite offspring solutions.
+        """
+        Check.is_not_none(parents)
+        Check.that(len(parents) == 2, "The number of parents is not two: " + str(len(parents)))
+        
+        offspring1 = []
+        offspring2 = []
+        
+        # Build probability list from operators
+        probability_list = [op.probability for op in self.crossover_operators_list]
+        
+        # Roulette wheel selection to choose which component to crossover
+        maximum = sum(probability_list)
+        rand_num = random.uniform(0.0, maximum)
+        value = 0.0
+        
+        number_of_components = parents[0].number_of_variables
+        
+        for i in range(number_of_components):
+            value += probability_list[i]
+            if value >= rand_num:
+                # Apply crossover to this component
+                component_parents = [parents[0].sub_solutions[i], parents[1].sub_solutions[i]]
+                children = self.crossover_operators_list[i].execute(component_parents)
+                offspring1.append(children[0])
+                offspring2.append(children[1])
+                # Set rand_num to max to ensure no other component is selected
+                rand_num = float('inf')
+            else:
+                # Copy this component unchanged from parents
+                offspring1.append(copy.deepcopy(parents[0].sub_solutions[i]))
+                offspring2.append(copy.deepcopy(parents[1].sub_solutions[i]))
+        
+        return [CompositeSolution(offspring1), CompositeSolution(offspring2)]
+
+    def get_number_of_parents(self) -> int:
+        return 2
+
+    def get_number_of_children(self) -> int:
+        return 2
+
+    def get_name(self) -> str:
+        return "AlternativeCompositeCrossover"
+
+
 class CompositeCrossover(Crossover[CompositeSolution, CompositeSolution]):
     __EPS = 1.0e-14
 
@@ -951,315 +1534,3 @@ class CompositeCrossover(Crossover[CompositeSolution, CompositeSolution]):
         return "CompositeCrossover"
 
 
-class FloatBLXAlphaCrossover(Crossover[FloatSolution, FloatSolution]):
-    """BLX-α crossover operator for float solutions.
-    
-    BLX-α (Blend Crossover with α) is a crossover operator for real-coded
-    genetic algorithms. It generates offspring in an extended interval around
-    the parent values.
-    
-    References:
-        Eshelman, L. J., & Schaffer, J. D. (1993). Real-coded genetic algorithms
-        and interval-schemata. Foundations of genetic algorithms, 2, 187-202.
-    """
-    
-    def __init__(self, probability: float, alpha: float = 0.5):
-        """Initialize BLX-α crossover operator.
-        
-        Args:
-            probability (float): Probability of applying crossover (0.0 to 1.0).
-            alpha (float): Expansion parameter. Higher values generate offspring
-                further from parents. Typical value is 0.5. Defaults to 0.5.
-        """
-        super(FloatBLXAlphaCrossover, self).__init__(probability=probability)
-        self.alpha = alpha
-        if alpha < 0:
-            from evolu.core.exceptions import InvalidParameterException
-            raise InvalidParameterException(
-                f"The alpha parameter is negative: {alpha}"
-            )
-    
-    def execute(self, parents: List[FloatSolution]) -> List[FloatSolution]:
-        """Apply BLX-α crossover to two float solutions.
-        
-        Args:
-            parents (List[FloatSolution]): Two parent solutions.
-            
-        Returns:
-            List[FloatSolution]: Two offspring generated by BLX-α crossover.
-        """
-        Check.that(issubclass(type(parents[0]), FloatSolution), "Solution type invalid")
-        Check.that(issubclass(type(parents[1]), FloatSolution), "Solution type invalid")
-        Check.that(len(parents) == 2, "The number of parents is not two: {}".format(len(parents)))
-        offsprings = copy.deepcopy(parents)
-        rand = random.random()
-        if rand <= self.probability:
-            for i in range(parents[0].number_of_variables):
-                x1, x2 = parents[0].variables[i], parents[1].variables[i]
-                d = abs(x1 - x2)
-                x_min = min(x1, x2)
-                x_max = max(x1, x2)
-                # Extended interval
-                lower = x_min - self.alpha * d
-                upper = x_max + self.alpha * d
-                # Clip to bounds
-                lower = max(lower, parents[0].lower_bound[i])
-                upper = min(upper, parents[0].upper_bound[i])
-                # Generate two offspring
-                offsprings[0].variables[i] = random.uniform(lower, upper)
-                offsprings[1].variables[i] = random.uniform(lower, upper)
-        return offsprings
-    
-    def get_number_of_parents(self) -> int:
-        return 2
-    
-    def get_number_of_children(self) -> int:
-        return 2
-    
-    def get_name(self) -> str:
-        return "FloatBLXAlphaCrossover"
-
-
-class FloatBLXAlphaBetaCrossover(Crossover[FloatSolution, FloatSolution]):
-    """BLX-αβ crossover operator for float solutions.
-    
-    BLX-αβ is an extension of BLX-α that uses two parameters (α and β) to
-    control the expansion on both sides of the parent interval independently.
-    
-    References:
-        Deep, K., & Thakur, M. (2007). A new crossover operator for real coded
-        genetic algorithms. Applied Mathematics and Computation, 188(1), 895-911.
-    """
-    
-    def __init__(self, probability: float, alpha: float = 0.5, beta: float = 0.5):
-        """Initialize BLX-αβ crossover operator.
-        
-        Args:
-            probability (float): Probability of applying crossover (0.0 to 1.0).
-            alpha (float): Expansion parameter for the lower side. Defaults to 0.5.
-            beta (float): Expansion parameter for the upper side. Defaults to 0.5.
-        """
-        super(FloatBLXAlphaBetaCrossover, self).__init__(probability=probability)
-        self.alpha = alpha
-        self.beta = beta
-        if alpha < 0 or beta < 0:
-            from evolu.core.exceptions import InvalidParameterException
-            raise InvalidParameterException(
-                f"The alpha or beta parameter is negative: alpha={alpha}, beta={beta}"
-            )
-    
-    def execute(self, parents: List[FloatSolution]) -> List[FloatSolution]:
-        """Apply BLX-αβ crossover to two float solutions.
-        
-        Args:
-            parents (List[FloatSolution]): Two parent solutions.
-            
-        Returns:
-            List[FloatSolution]: Two offspring generated by BLX-αβ crossover.
-        """
-        Check.that(issubclass(type(parents[0]), FloatSolution), "Solution type invalid")
-        Check.that(issubclass(type(parents[1]), FloatSolution), "Solution type invalid")
-        Check.that(len(parents) == 2, "The number of parents is not two: {}".format(len(parents)))
-        offsprings = copy.deepcopy(parents)
-        rand = random.random()
-        if rand <= self.probability:
-            for i in range(parents[0].number_of_variables):
-                x1, x2 = parents[0].variables[i], parents[1].variables[i]
-                d = abs(x1 - x2)
-                x_min = min(x1, x2)
-                x_max = max(x1, x2)
-                # Extended interval with independent parameters
-                lower = x_min - self.alpha * d
-                upper = x_max + self.beta * d
-                # Clip to bounds
-                lower = max(lower, parents[0].lower_bound[i])
-                upper = min(upper, parents[0].upper_bound[i])
-                # Generate two offspring
-                offsprings[0].variables[i] = random.uniform(lower, upper)
-                offsprings[1].variables[i] = random.uniform(lower, upper)
-        return offsprings
-    
-    def get_number_of_parents(self) -> int:
-        return 2
-    
-    def get_number_of_children(self) -> int:
-        return 2
-    
-    def get_name(self) -> str:
-        return "FloatBLXAlphaBetaCrossover"
-
-
-class FloatNPointCrossover(Crossover[FloatSolution, FloatSolution]):
-    """N-point crossover operator for float solutions.
-    
-    This is a generalized version of one-point and two-point crossover that
-    allows any number of crossover points. It divides the variables into
-    segments and alternates between parents for each segment.
-    
-    Args:
-        probability (float): Probability of applying crossover.
-        number_of_points (int): Number of crossover points. Must be at least 1
-            and less than the number of variables.
-    """
-    
-    def __init__(self, probability: float, number_of_points: int = 2):
-        super(FloatNPointCrossover, self).__init__(probability=probability)
-        self.number_of_points = number_of_points
-        if number_of_points < 1:
-            from evolu.core.exceptions import InvalidParameterException
-            raise InvalidParameterException(
-                f"The number of points must be at least 1: {number_of_points}"
-            )
-    
-    def execute(self, parents: List[FloatSolution]) -> List[FloatSolution]:
-        """Apply N-point crossover to two float solutions.
-        
-        Args:
-            parents (List[FloatSolution]): Two parent solutions.
-            
-        Returns:
-            List[FloatSolution]: Two offspring generated by N-point crossover.
-        """
-        Check.that(issubclass(type(parents[0]), FloatSolution), "Solution type invalid")
-        Check.that(issubclass(type(parents[1]), FloatSolution), "Solution type invalid")
-        Check.that(len(parents) == 2, "The number of parents is not two: {}".format(len(parents)))
-        offsprings = copy.deepcopy(parents)
-        rand = random.random()
-        if rand <= self.probability:
-            n_vars = parents[0].number_of_variables
-            if n_vars > self.number_of_points:
-                # Select crossover points
-                points = sorted(random.sample(range(1, n_vars), min(self.number_of_points, n_vars - 1)))
-                points = [0] + points + [n_vars]
-                # Alternate between parents for each segment
-                for seg in range(len(points) - 1):
-                    start = points[seg]
-                    end = points[seg + 1]
-                    if seg % 2 == 0:
-                        # First parent's segment
-                        for i in range(start, end):
-                            offsprings[0].variables[i] = parents[0].variables[i]
-                            offsprings[1].variables[i] = parents[1].variables[i]
-                    else:
-                        # Second parent's segment
-                        for i in range(start, end):
-                            offsprings[0].variables[i] = parents[1].variables[i]
-                            offsprings[1].variables[i] = parents[0].variables[i]
-        return offsprings
-    
-    def get_number_of_parents(self) -> int:
-        return 2
-    
-    def get_number_of_children(self) -> int:
-        return 2
-    
-    def get_name(self) -> str:
-        return "FloatNPointCrossover"
-
-
-class FloatSinglePointPolynomialCrossover(Crossover[FloatSolution, FloatSolution]):
-    """Single-Point Polynomial (SPX) crossover operator for float solutions.
-    
-    SPX is a variant of SBX (Simulated Binary Crossover) that uses a single crossover point and applies
-    polynomial distribution only at that point, while other variables are
-    directly copied from parents.
-    
-    References:
-        Deb, K., & Agrawal, R. B. (1995). Simulated binary crossover for
-        continuous search space. Complex systems, 9(2), 115-148.
-    """
-    __EPS = 1.0e-14
-    
-    def __init__(self, probability: float, distribution_index: float = 20.0):
-        """Initialize Single-Point Polynomial crossover operator.
-        
-        Args:
-            probability (float): Probability of applying crossover.
-            distribution_index (float): Distribution index controlling the spread.
-                Higher values produce offspring closer to parents. Defaults to 20.0.
-        """
-        super(FloatSinglePointPolynomialCrossover, self).__init__(probability=probability)
-        self.distribution_index = distribution_index
-        if distribution_index < 0:
-            from evolu.core.exceptions import InvalidParameterException
-            raise InvalidParameterException(
-                f"The distribution index is negative: {distribution_index}"
-            )
-    
-    def execute(self, parents: List[FloatSolution]) -> List[FloatSolution]:
-        """Apply Single-Point Polynomial crossover to two float solutions.
-        
-        Args:
-            parents (List[FloatSolution]): Two parent solutions.
-            
-        Returns:
-            List[FloatSolution]: Two offspring generated by Single-Point Polynomial crossover.
-        """
-        Check.that(issubclass(type(parents[0]), FloatSolution), "Solution type invalid")
-        Check.that(issubclass(type(parents[1]), FloatSolution), "Solution type invalid")
-        Check.that(len(parents) == 2, "The number of parents is not two: {}".format(len(parents)))
-        offsprings = copy.deepcopy(parents)
-        rand = random.random()
-        if rand <= self.probability:
-            n_vars = parents[0].number_of_variables
-            if n_vars > 1:
-                # Select single crossover point
-                crossover_point = random.randint(0, n_vars - 1)
-                # Apply polynomial crossover at the crossover point
-                i = crossover_point
-                value_x1, value_x2 = parents[0].variables[i], parents[1].variables[i]
-                if abs(value_x1 - value_x2) > self.__EPS:
-                    if value_x1 < value_x2:
-                        y1, y2 = value_x1, value_x2
-                    else:
-                        y1, y2 = value_x2, value_x1
-                    lower_bound = parents[0].lower_bound[i]
-                    upper_bound = parents[0].upper_bound[i]
-                    beta = 1.0 + (2.0 * (y1 - lower_bound) / (y2 - y1))
-                    alpha = 2.0 - pow(beta, -(self.distribution_index + 1.0))
-                    rand = random.random()
-                    if rand <= (1.0 / alpha):
-                        betaq = pow(rand * alpha, (1.0 / (self.distribution_index + 1.0)))
-                    else:
-                        betaq = pow(1.0 / (2.0 - rand * alpha), 1.0 / (self.distribution_index + 1.0))
-                    c1 = 0.5 * (y1 + y2 - betaq * (y2 - y1))
-                    beta = 1.0 + (2.0 * (upper_bound - y2) / (y2 - y1))
-                    alpha = 2.0 - pow(beta, -(self.distribution_index + 1.0))
-                    if rand <= (1.0 / alpha):
-                        betaq = pow((rand * alpha), (1.0 / (self.distribution_index + 1.0)))
-                    else:
-                        betaq = pow(1.0 / (2.0 - rand * alpha), 1.0 / (self.distribution_index + 1.0))
-                    c2 = 0.5 * (y1 + y2 + betaq * (y2 - y1))
-                    if c1 < lower_bound:
-                        c1 = lower_bound
-                    if c2 < lower_bound:
-                        c2 = lower_bound
-                    if c1 > upper_bound:
-                        c1 = upper_bound
-                    if c2 > upper_bound:
-                        c2 = upper_bound
-                    if random.random() <= 0.5:
-                        offsprings[0].variables[i] = c2
-                        offsprings[1].variables[i] = c1
-                    else:
-                        offsprings[0].variables[i] = c1
-                        offsprings[1].variables[i] = c2
-                # Copy other variables from parents
-                for j in range(n_vars):
-                    if j != crossover_point:
-                        if random.random() <= 0.5:
-                            offsprings[0].variables[j] = parents[0].variables[j]
-                            offsprings[1].variables[j] = parents[1].variables[j]
-                        else:
-                            offsprings[0].variables[j] = parents[1].variables[j]
-                            offsprings[1].variables[j] = parents[0].variables[j]
-        return offsprings
-    
-    def get_number_of_parents(self) -> int:
-        return 2
-    
-    def get_number_of_children(self) -> int:
-        return 2
-    
-    def get_name(self) -> str:
-        return "FloatSinglePointPolynomialCrossover"

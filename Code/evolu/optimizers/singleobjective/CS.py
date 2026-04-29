@@ -151,7 +151,7 @@ class ICS(CSBase[S, R]):
         self.abandon_rate = 0.2
         self.neighbor_size = 10
         self.local_search_probability = 0.1
-        self.scout_time = 200
+        self.scout_time = 10
         self.replacement_operator = JoinPopulationSelectionReplacement(self.comparator)
 
     def selection(self, population: List[S]) -> List[S]:

@@ -128,9 +128,11 @@ class MOEAD(MultiObjectiveSwarmRoot[S, R]):
         return selected_solutions
 
     def reproduction(self, population: List[S]) -> List[S]:
-        self.crossover_operator.current_individual = self.solutions[self.current_solution_id]
-        offsprings = self.crossover_operator.execute(population)
-        offsprings[0] = self.mutation_operator.execute(offsprings[0])
+        offsprings = []
+        offspring = self.crossover_operator.execute(self.solutions[self.current_solution_id], population)
+        offsprings.append(offspring)
+        new_solution = self.mutation_operator.execute(offsprings[0])
+        offsprings[0] = new_solution
         return offsprings
 
     def replacement(self, population: List[S], offsprings: List[S]) -> List[S]:
@@ -145,17 +147,19 @@ class MOEAD(MultiObjectiveSwarmRoot[S, R]):
             permuted_neighbors_indexes = copy.deepcopy(neighbors.tolist())
         else:
             permuted_neighbors_indexes = Permutation(self.population_size).get_permutation()
+        # Create a deep copy of population to match C++ behavior
+        new_solutions = copy.deepcopy(population)
         replacements = 0
         for i in range(len(permuted_neighbors_indexes)):
             k = permuted_neighbors_indexes[i]
             f1 = self.objective_function.compute(population[k].objectives, self.neighborhood.weight_vectors[k])
             f2 = self.objective_function.compute(new_solution.objectives, self.neighborhood.weight_vectors[k])
             if f2 < f1:
-                population[k] = copy.deepcopy(new_solution)
+                new_solutions[k] = copy.deepcopy(new_solution)
                 replacements += 1
             if replacements >= self.max_number_of_replaced_solutions:
                 break
-        return population
+        return new_solutions
 
     def get_description(self) -> str:
         """Get the description of the algorithm."""
@@ -179,8 +183,8 @@ class MOEAD_DRA(MOEAD):
     def __init__(self,
                  problem,
                  population_size,
-                 mutation,
                  crossover,
+                 mutation,
                  aggregation_function,
                  neighborhood_selection_probability,
                  max_number_of_replaced_solutions,
@@ -193,8 +197,8 @@ class MOEAD_DRA(MOEAD):
         super(MOEAD_DRA, self).__init__(
             problem,
             population_size,
-            mutation,
             crossover,
+            mutation,
             aggregation_function,
             neighborhood_selection_probability,
             max_number_of_replaced_solutions,
@@ -304,8 +308,8 @@ class MOEADIEpsilon(MOEAD):
     def __init__(self,
                  problem: Problem,
                  population_size: int,
-                 mutation: Mutation,
                  crossover: FloatDifferentialEvolutionCrossover,
+                 mutation: Mutation,
                  aggregation_function: AggregationFunction,
                  neighborhood_selection_probability: float,
                  max_number_of_replaced_solutions: int,
@@ -323,8 +327,8 @@ class MOEADIEpsilon(MOEAD):
         super(MOEADIEpsilon, self).__init__(
             problem=problem,
             population_size=population_size,
-            mutation=mutation,
             crossover=crossover,
+            mutation=mutation,
             aggregation_function=aggregation_function,
             neighborhood_selection_probability=neighborhood_selection_probability,
             max_number_of_replaced_solutions=max_number_of_replaced_solutions,

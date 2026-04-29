@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 import copy
 import random
-import numpy as np
 from typing import List, TypeVar
 from evolu.config import store
 from evolu.core.algorithm import SingleObjectiveSwarmRoot
@@ -39,7 +38,7 @@ class TLBOBase(SingleObjectiveSwarmRoot[S, R]):
         population_size (int): number of population size, default = 100; [2, 10000]
         """
         super(TLBOBase, self).__init__(problem=problem, population_size=population_size)
-        self.algorithm_name = "Teaching–learning-based optimization"
+        self.algorithm_name = "Teaching-learning-based optimization"
         self.population_generator = population_generator
         self.population_evaluator = population_evaluator
         self.termination_criterion = termination_criterion
@@ -49,8 +48,10 @@ class TLBOBase(SingleObjectiveSwarmRoot[S, R]):
 
     def teacher_phase_reproduction(self, population: List[S]) -> List[S]:
         offsprings = copy.deepcopy(population)
-        position_list = np.array([item.variables for item in self.solutions])
-        mean_position = np.mean(position_list, axis=0)
+        mean_position = [0.0] * self.problem.number_of_variables
+        for j in range(0, self.population_size):
+            for i in range(self.problem.number_of_variables):
+                mean_position[i] += population[j].variables[i] / (self.population_size * 1.0)
         for j in range(0, self.population_size):
             # Teaching Phrase
             TF = random.randint(1, 2)  # 1 or 2 (never 3)

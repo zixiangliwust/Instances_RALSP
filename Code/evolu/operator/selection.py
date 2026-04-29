@@ -49,7 +49,7 @@ class NaryRandomSolutionSelection(Selection[List[S], S]):
             )
         self.number_of_returned_solutions = number_of_returned_solutions
 
-    def execute(self, front: List[S]) -> S:
+    def execute(self, front: List[S]) -> List[S]:
         """Randomly sample a given number of solutions without replacement.
 
         Args:
@@ -122,7 +122,7 @@ class WorstSolutionSelection(Selection[List[S], S]):
                 worst_solution = solution
         return worst_solution
 
-    def return_index(self, front: List[S]) -> S:
+    def return_index(self, front: List[S]) -> int:
         if front is None:
             raise EmptyFrontException("The front is null")
         elif len(front) == 0:
@@ -255,7 +255,7 @@ class BinaryTournamentSelection(Selection[List[S], S]):
                 result = [solution1, solution2][random.random() < 0.5]
         return result
 
-    def return_index(self, front: List[S]) -> S:
+    def return_index(self, front: List[S]) -> int:
         if front is None:
             raise EmptyFrontException("The front is null")
         elif len(front) == 0:
@@ -307,7 +307,7 @@ class BinaryTournament2Selection(Selection[List[S], S]):
             else:
                 return solution2
 
-    def return_index(self, front: List[S]) -> S:
+    def return_index(self, front: List[S]) -> int:
         if front is None:
             raise EmptyFrontException("The front is null")
         elif len(front) == 0:
@@ -411,14 +411,13 @@ class RankingAndCrowdingDistanceSelection(Selection[List[S], List[S]]):
         ranking_id = 0
         result_list = []
         while len(result_list) < self.max_population_size:
-            if len(self.ranking.get_sub_front(ranking_id)) < (self.max_population_size - len(result_list)):
-                current_ranked_solutions = self.ranking.get_sub_front(ranking_id)
-                self.density_estimator.compute_density_estimator(current_ranked_solutions)
+            current_ranked_solutions = self.ranking.get_sub_front(ranking_id)
+            # Compute density estimator once per rank (matches C++ implementation)
+            self.density_estimator.compute_density_estimator(current_ranked_solutions)
+            if len(current_ranked_solutions) < (self.max_population_size - len(result_list)):
                 result_list = result_list + current_ranked_solutions
                 ranking_id += 1
             else:
-                current_ranked_solutions = self.ranking.get_sub_front(ranking_id)
-                self.density_estimator.compute_density_estimator(current_ranked_solutions)
                 sorted_sub_front = sorted(current_ranked_solutions, key=lambda x: x.attributes["crowding_distance"],
                                           reverse=True)
                 for i in range(self.max_population_size - len(result_list)):
@@ -448,14 +447,13 @@ class RankingAndDensityEstimatorSelection(Selection[List[S], List[S]]):
         ranking_id = 0
         result_list = []
         while len(result_list) < self.max_population_size:
-            if len(self.ranking.get_sub_front(ranking_id)) < (self.max_population_size - len(result_list)):
-                current_ranked_solutions = self.ranking.get_sub_front(ranking_id)
-                self.density_estimator.compute_density_estimator(current_ranked_solutions)
+            current_ranked_solutions = self.ranking.get_sub_front(ranking_id)
+            # Compute density estimator once per rank (matches C++ implementation)
+            self.density_estimator.compute_density_estimator(current_ranked_solutions)
+            if len(current_ranked_solutions) < (self.max_population_size - len(result_list)):
                 result_list = result_list + current_ranked_solutions
                 ranking_id += 1
             else:
-                current_ranked_solutions = self.ranking.get_sub_front(ranking_id)
-                self.density_estimator.compute_density_estimator(current_ranked_solutions)
                 self.density_estimator.sort(current_ranked_solutions)
                 for i in range(self.max_population_size - len(result_list)):
                     result_list.append(current_ranked_solutions[i])

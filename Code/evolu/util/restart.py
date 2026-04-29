@@ -147,7 +147,10 @@ class ReplaceDuplicatedSolutionWithNewSolution(Restart[S]):
         for j in range(0, len(result_list) - 1):
             for k in range(j + 1, len(result_list)):
                 if self.identical_solutions_comparator.compare(result_list[j], result_list[k]) == 0:
-                    result_list[k] = self.problem.create_solution()
+                    # Create new solution and evaluate it
+                    new_solution = self.problem.create_solution()
+                    new_solution = self.problem.evaluate_solution(new_solution)
+                    result_list[k] = new_solution
         return result_list
 
     def get_name(self) -> str:

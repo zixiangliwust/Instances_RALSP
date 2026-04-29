@@ -40,7 +40,7 @@ class BABase(SingleObjectiveSwarmRoot[S, R]):
         self.population_evaluator = population_evaluator
         self.termination_criterion = termination_criterion
         self.observable.register(termination_criterion)
-        self.num_of_elite_bees = 1
+        self.num_of_elite_bees = 2
         self.num_of_selected_bees = 9
         self.neighbor_size_of_elite_bee = 5
         self.neighbor_size_of_selected_bee = 1
@@ -107,7 +107,7 @@ class IBA(SingleObjectiveSwarmRoot[S, R]):
         self.population_evaluator = population_evaluator
         self.termination_criterion = termination_criterion
         self.observable.register(termination_criterion)
-        self.num_of_elite_bees = 1
+        self.num_of_elite_bees = 2
         self.num_of_selected_bees = 9
         self.neighbor_size_of_elite_bee = 5
         self.neighbor_size_of_selected_bee = 1

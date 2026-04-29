@@ -45,7 +45,7 @@ class ABCBase(SingleObjectiveSwarmRoot[S, R]):
         self.population_evaluator = population_evaluator
         self.termination_criterion = termination_criterion
         self.observable.register(termination_criterion)
-        self.scout_time = 200
+        self.scout_time = 120
         self.offspring_population_size = 2 * self.population_size
 
     def employed_bee_selection(self, population: List[S]) -> List[S]:

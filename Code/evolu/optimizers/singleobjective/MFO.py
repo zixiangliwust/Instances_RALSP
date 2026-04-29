@@ -65,6 +65,8 @@ class MFOBase(SingleObjectiveSwarmRoot[S, R]):
         # Number of flames Eq.(3.14) in the paper (linearly decreased)
         num_flame = round(
             self.population_size - (self.iterations + 1) * ((self.population_size - 1) / self.max_iterations))
+        # Ensure num_flame is within valid range [0, population_size - 1]
+        num_flame = max(0, min(num_flame, self.population_size - 1))
         # a linearly decreases from -1 to -2 to calculate t in Eq. (3.12)
         a = -1 + (self.iterations + 1) * ((-1) / self.max_iterations)
         for j in range(0, self.population_size):

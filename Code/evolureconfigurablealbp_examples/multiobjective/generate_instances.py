@@ -47,26 +47,26 @@ B_L_OPTIONS = [3, 4, 5]            # window length for part frequency constraint
 # Pre-defined product demand patterns (minimum production cycles)
 # Total demand from 10 to 29, each pattern has GCD = 1
 DEMAND_PATTERNS = [
-    [2, 2, 3, 3],   # total 10
-    [2, 2, 3, 4],   # total 11
-    [2, 3, 3, 4],   # total 12
-    [2, 3, 4, 4],   # total 13
-    [2, 3, 4, 5],   # total 14
-    [3, 3, 4, 5],   # total 15
-    [3, 4, 4, 5],   # total 16
-    [3, 4, 5, 5],   # total 17
-    [3, 4, 5, 6],   # total 18
-    [4, 4, 5, 6],   # total 19
-    [4, 5, 5, 6],   # total 20
-    [4, 5, 6, 6],   # total 21
-    [4, 5, 6, 7],   # total 22
-    [5, 5, 6, 7],   # total 23
-    [5, 6, 6, 7],   # total 24
-    [5, 6, 7, 7],   # total 25
-    [5, 6, 7, 8],   # total 26
-    [6, 6, 7, 8],   # total 27
-    [6, 7, 7, 8],   # total 28
-    [6, 7, 8, 8],   # total 29
+    [2, 2, 3, 3], # total 10
+    [2, 2, 3, 4], # total 11
+    [2, 3, 3, 4], # total 12
+    [2, 3, 4, 4], # total 13
+    [2, 3, 4, 5], # total 14
+    [3, 3, 4, 5], # total 15
+    [3, 4, 4, 5], # total 16
+    [3, 4, 5, 5], # total 17
+    [3, 4, 5, 6], # total 18
+    [4, 4, 5, 6], # total 19
+    [4, 5, 5, 6], # total 20
+    [4, 5, 6, 6], # total 21
+    [4, 5, 6, 7], # total 22
+    [5, 5, 6, 7], # total 23
+    [5, 6, 6, 7], # total 24
+    [5, 6, 7, 7], # total 25
+    [5, 6, 7, 8], # total 26
+    [6, 6, 7, 8], # total 27
+    [6, 7, 7, 8], # total 28
+    [6, 7, 8, 8], # total 29
 ]
 assert len(DEMAND_PATTERNS) == INSTANCES_PER_STATION_COUNT
 

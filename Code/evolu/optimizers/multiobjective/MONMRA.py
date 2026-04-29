@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import random
 import copy
+import numpy as np
 from typing import List, Optional, TypeVar
 from evolu.config import store
 from evolu.core.algorithm import MultiObjectiveSwarmRoot

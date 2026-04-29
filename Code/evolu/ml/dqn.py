@@ -24,11 +24,11 @@ class DQN:
         state_dim (int): Dimension of the state space.
         action_dim (int): Number of possible actions.
         learning_rate (float): Learning rate for gradient descent.
-        gamma (float): Discount factor for future rewards.
-        epsilon (float): Epsilon value for epsilon-greedy exploration.
-        epsilon_min (float): Minimum epsilon value (for decay).
-        epsilon_decay (float): Decay rate for epsilon.
-        memory_size (int): Maximum size of replay buffer.
+        reward_decay (float): Discount factor for future rewards.
+        epsilon_greedy (float): Epsilon-greedy value for exploitation (higher = more exploitation).
+        epsilon_greedy_min (float): Minimum epsilon-greedy value (for decay).
+        epsilon_greedy_decay (float): Decay rate for epsilon-greedy.
+        replay_buffer_size (int): Maximum size of replay buffer.
         batch_size (int): Mini-batch size for training.
         memory (deque): Experience replay buffer.
         q_network (np.ndarray): Q-network weights (simplified as linear model).
@@ -55,11 +55,11 @@ class DQN:
                  state_dim: int,
                  action_dim: int,
                  learning_rate: float = 0.001,
-                 gamma: float = 0.95,
-                 epsilon: float = 1.0,
-                 epsilon_min: float = 0.01,
-                 epsilon_decay: float = 0.995,
-                 memory_size: int = 2000,
+                 reward_decay: float = 0.95,
+                 epsilon_greedy: float = 0.9,
+                 epsilon_greedy_min: float = 0.01,
+                 epsilon_greedy_decay: float = 0.995,
+                 replay_buffer_size: int = 10000,
                  batch_size: int = 32) -> None:
         """Initialize DQN agent.
         
@@ -67,25 +67,25 @@ class DQN:
             state_dim (int): Dimension of the state space.
             action_dim (int): Number of possible actions.
             learning_rate (float): Learning rate for network updates. Defaults to 0.001.
-            gamma (float): Discount factor for future rewards. Defaults to 0.95.
-            epsilon (float): Initial epsilon for epsilon-greedy policy. Defaults to 1.0.
-            epsilon_min (float): Minimum epsilon value. Defaults to 0.01.
-            epsilon_decay (float): Decay rate for epsilon. Defaults to 0.995.
-            memory_size (int): Maximum size of replay buffer. Defaults to 2000.
+            reward_decay (float): Discount factor for future rewards. Defaults to 0.95.
+            epsilon_greedy (float): Initial epsilon-greedy for exploitation rate. Defaults to 0.9.
+            epsilon_greedy_min (float): Minimum epsilon-greedy value. Defaults to 0.01.
+            epsilon_greedy_decay (float): Decay rate for epsilon-greedy. Defaults to 0.995.
+            replay_buffer_size (int): Maximum size of replay buffer. Defaults to 10000.
             batch_size (int): Mini-batch size for training. Defaults to 32.
         """
         self.state_dim = state_dim
         self.action_dim = action_dim
         self.learning_rate = learning_rate
-        self.gamma = gamma
-        self.epsilon = epsilon
-        self.epsilon_min = epsilon_min
-        self.epsilon_decay = epsilon_decay
-        self.memory_size = memory_size
+        self.reward_decay = reward_decay
+        self.epsilon_greedy = epsilon_greedy
+        self.epsilon_greedy_min = epsilon_greedy_min
+        self.epsilon_greedy_decay = epsilon_greedy_decay
+        self.replay_buffer_size = replay_buffer_size
         self.batch_size = batch_size
         
         # Experience replay buffer
-        self.memory = deque(maxlen=memory_size)
+        self.memory = deque(maxlen=self.replay_buffer_size)
         
         # Initialize networks (simplified linear approximation)
         self.q_network = self._build_network()
@@ -132,7 +132,8 @@ class DQN:
         Returns:
             int: Index of selected action.
         """
-        if np.random.rand() <= self.epsilon:
+        # Epsilon-greedy: with probability (1 - epsilon_greedy) explore, else exploit
+        if np.random.rand() >= self.epsilon_greedy:
             # Exploration: random action
             return random.randrange(self.action_dim)
         
@@ -156,6 +157,10 @@ class DQN:
             done (bool): Whether episode is done.
         """
         self.memory.append((state, action, reward, next_state, done))
+        
+        # Decay epsilon_greedy (matches C++ store_transition behavior)
+        if self.epsilon_greedy > self.epsilon_greedy_min:
+            self.epsilon_greedy *= self.epsilon_greedy_decay
     
     def replay(self) -> Optional[float]:
         """Train the network using experience replay.
@@ -179,7 +184,7 @@ class DQN:
                 target_q = reward
             else:
                 next_q_values = self._predict(next_state, self.target_network)
-                target_q = reward + self.gamma * np.max(next_q_values)
+                target_q = reward + self.reward_decay * np.max(next_q_values)
                 
             # Current Q-value prediction
             state_with_bias = np.append(state, 1.0)
@@ -198,10 +203,6 @@ class DQN:
             # Apply gradient clipping to prevent large updates
             gradient = np.clip(gradient, -1.0, 1.0)
             self.q_network[:, action] -= self.learning_rate * gradient  # Minus because we want to go down the gradient
-            
-        # Decay epsilon
-        if self.epsilon > self.epsilon_min:
-            self.epsilon *= self.epsilon_decay
             
         return total_loss / self.batch_size
     

@@ -100,7 +100,7 @@ class VNSSA(SingleObjectiveSwarmRoot[S, R]):
 
     def __init__(self,
                  problem: Problem[S],
-                 mutation_operator_list: Mutation,
+                 mutation_operator_list: list,
                  comparator: Comparator = store.default_comparator,
                  termination_criterion: TerminationCriterion = store.default_termination_criteria,
                  ):
