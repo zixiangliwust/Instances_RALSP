@@ -224,24 +224,7 @@ The QMOHH was compared against nine high-performing algorithms:
 
 ## 🔄 Version History
 
-### v3.0 - March 2026 (Current)
-- **Complete repository with full implementation**
-- Added source code directory (Code/) with RALSP implementation
-- Added experimental results directory (results/) with complete data
-- Includes quality indicator summaries and Pareto solutions
-- Provides visualization data for paper figures
-- Updated repository structure documentation
-
-### v2.0 - March 2026
-- 120 systematically generated benchmark instances
-- Organized by workstation scale (5, 10, 15, 20, 25, 30 stations)
-- Reproducible generation with fixed random seed
-- Added instance generation script
-- Updated instance format with interval time parameter
-
-### v1.0 - Previous Version
-- 100 experimental instances (experimental_data_100_*.txt)
-- Initial benchmark suite
+The full version history is maintained in [CHANGELOG.md](CHANGELOG.md).
 
 When referencing this work, please cite as:
 
@@ -295,3 +278,13 @@ The paper suggests several promising avenues for future work:
 ---
 
 **Note**: This repository provides the complete implementation, benchmark instances, and experimental results to support reproducibility and future research in reconfigurable assembly line scheduling.
+
+---
+
+## Document Index
+
+- [CHANGELOG.md](CHANGELOG.md) — version history and changelog
+- [VERSION](VERSION) — current version
+- [LICENSE](LICENSE) — license
+
+**Maintainer:** IISO Team ｜ **Version:** 3.0.0 ｜ **Last Updated:** 2026-10-12
